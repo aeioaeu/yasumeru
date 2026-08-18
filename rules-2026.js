@@ -632,57 +632,68 @@ export const RULES = {
 };
 
 // 出典の一覧。画面から参照する。
+// shown: true は、いま画面に出している数字の根拠。
+// 画面から外した節（保育料・助成金・法律など）の資料も、戻すときのために消さずに置いてある。
 export const SOURCES = [
   {
     label: '育児休業等給付の内容と支給申請手続（2026年8月版）',
+    shown: true,
     org: '厚生労働省・都道府県労働局・ハローワーク',
     url: 'https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/0000135090_00001.html',
     covers: '給付率67%/50%、休業開始時賃金日額の上限16,540円・下限3,203円、支給上限額、出生後休業支援給付金13%・最大28日、対象期間（父8週・母16週）と配偶者要件、母の育休開始日は出生日から58日目、1人あたりの上限1年、非課税であること、社会保険料の免除',
   },
   {
     label: '出産で会社を休んだとき（出産手当金）',
+    shown: true,
     org: '全国健康保険協会（協会けんぽ）',
     url: 'https://www.kyoukaikenpo.or.jp/benefit/childbirth/001/index.html',
     covers: '出産手当金の支給期間（出産予定日以前42日〜出産翌日以後56日）と、1日あたりの額（標準報酬月額の平均÷30×2/3）',
   },
   {
     label: '産前産後休業期間中の保険料免除',
+    shown: true,
     org: '日本年金機構',
     url: 'https://www.nenkin.go.jp/service/kounen/hokenryo/menjo/sankyu-menjo/index.html',
     covers: '産休中の健康保険・厚生年金保険料の免除（本人・事業主とも）、免除される月の範囲',
   },
   {
     label: '令和8年4月 源泉所得税の改正のあらまし',
+    shown: true,
     org: '国税庁',
     url: 'https://www.nta.go.jp/publication/pamph/gensen/2026kaisei.pdf',
     covers: '基礎控除の引上げ（令和8・9年分）、給与所得控除の最低保障額74万円',
   },
   {
     label: 'タックスアンサー No.1410 給与所得控除',
+    shown: true,
     org: '国税庁',
     url: 'https://www.nta.go.jp/taxes/shiraberu/taxanswer/shotoku/1410.htm',
     covers: '給与所得控除の速算表',
   },
   {
     label: '令和8年度保険料額表',
+    shown: true,
     org: '全国健康保険協会（協会けんぽ）',
     url: 'https://www.kyoukaikenpo.or.jp/about/business/insurance_rate/premium_prefectures/r08/index.html',
     covers: '健康保険料率（全国平均9.9%）、介護保険料率1.62%',
   },
   {
     label: '厚生年金保険の保険料額表',
+    shown: true,
     org: '日本年金機構',
     url: 'https://www.nenkin.go.jp/service/kounen/hokenryo/ryogaku/ryogakuhyo/20200825.html',
     covers: '厚生年金保険料率18.3%、標準報酬月額の上限65万円',
   },
   {
     label: '育児休業等期間中の社会保険料免除要件',
+    shown: true,
     org: '日本年金機構',
     url: 'https://www.nenkin.go.jp/oshirase/topics/2022/0729.files/ikukyu-chirashi.pdf',
     covers: '月末ルール・14日ルール、賞与の取扱い',
   },
   {
     label: '令和8年度 雇用保険料率のご案内',
+    shown: true,
     org: '厚生労働省',
     url: 'https://jsite.mhlw.go.jp/tochigi-roudoukyoku/newpage_01657.html',
     covers: '雇用保険料率（一般の事業・労働者負担5/1000）',
