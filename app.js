@@ -33,7 +33,7 @@ function readPerson(role) {
   const q = (cls) => node.querySelector(cls);
   const num = (cls, dflt) => Math.max(0, Number(q(cls).value) || dflt);
   return {
-    label: (q('.p-label').value || '').trim() || (role === 'mother' ? '母' : '父'),
+    label: (q('.p-label').value || '').trim() || (role === 'mother' ? '母' : 'あなた'),
     monthlySalary: num('.p-salary', 0),
     annualBonus: num('.p-bonus', 0),
     bonusMonths: [6, 12],
@@ -92,6 +92,8 @@ function peopleOf(house) {
 
 // その月の、人ごとのセル
 const perOf = (m, sc) => PEOPLE.map((p) => ({ label: p.label, role: p.role, c: m[sc][p.role] }));
+// 呼び方の欄に入れたもの。画面に出す文字はここから取る（「父」と直書きしない）。
+const nameOf = (role) => (PEOPLE.find((p) => p.role === role) || {}).label || '';
 
 // ── SVG の小道具 ──────────────────────────
 
@@ -264,11 +266,11 @@ function drawNetChart(house) {
     svg.appendChild(el('text', {
       class: 'series-label s1', x: x(sepIdx) + ox,
       y: y(ms[sepIdx].takeNetExBonus) + (aHigher ? -10 : 20), 'text-anchor': anchor,
-    }, '父が育休を取る'));
+    }, `${nameOf('father')}が育休を取る`));
     svg.appendChild(el('text', {
       class: 'series-label s2', x: x(sepIdx) + ox,
       y: y(ms[sepIdx].skipNetExBonus) + (aHigher ? 20 : -10), 'text-anchor': anchor,
-    }, '父が取らない'));
+    }, `${nameOf('father')}が取らない`));
   }
 
   svg.appendChild(el('circle', { class: 'dot-1', cx: x(n - 1), cy: y(ms[n - 1].takeNetExBonus), r: 4 }));
@@ -296,8 +298,8 @@ function drawNetChart(house) {
       .map((x) => `${x.label}は${x.c.onSankyu && !x.c.onIkukyu ? '産休' : '育休'}`);
     tip.innerHTML =
       `<b>${m.year}年${m.month}月${off.length ? `（${off.join('・')}）` : ''}</b>` +
-      `<div class="row s1"><span><i></i>父が育休を取る</span><span>${fmt(m.takeNetExBonus)}円</span></div>` +
-      `<div class="row s2"><span><i></i>父が取らない</span><span>${fmt(m.skipNetExBonus)}円</span></div>` +
+      `<div class="row s1"><span><i></i>${nameOf('father')}が育休を取る</span><span>${fmt(m.takeNetExBonus)}円</span></div>` +
+      `<div class="row s2"><span><i></i>${nameOf('father')}が取らない</span><span>${fmt(m.skipNetExBonus)}円</span></div>` +
       (m.benefit > 0 ? `<div class="tip-note">育児休業給付の発生 ${fmt(m.benefit)}円（入金は別のタイミング）</div>` : '') +
       (m.teate > 0 ? `<div class="tip-note">出産手当金の発生 ${fmt(m.teate)}円</div>` : '') +
       `<div class="tip-note">住民税 ${fmt(m.residentTax)}円は${m.take.mother.residentTaxBaseYear}年の所得に対するもの</div>`;
@@ -414,8 +416,8 @@ function drawPaidCharts(house) {
     lead.className = 'note';
     lead.innerHTML = compare
       ? '育休を取ると、その年の支払金額が下がります。'
-      : `<strong>父が育休を取っても取らなくても同じです。</strong>` +
-        `母の産休と育休はどちらの場合も同じだけあるので、書類の上の年収はどちらでも下がります。`;
+      : `<strong>${nameOf('father')}が育休を取っても取らなくても同じです。</strong>` +
+        `${nameOf('mother')}の産休と育休はどちらの場合も同じだけあるので、書類の上の年収はどちらでも下がります。`;
     host.appendChild(lead);
 
     if (compare) {
@@ -535,7 +537,7 @@ function drawCare(house) {
       `保育がはじまる ${ym(house.careStartAbs)} の保育料は、<strong>${first.basisYear}年の所得</strong>で決まります。` +
       `${names}を合わせた所得割額は <strong>${fmt(first.household)}円</strong>。` +
       (d > 0
-        ? `父が育休を取らなかった場合は ${fmt(firstNo.household)}円 なので、<strong>${fmt(d)}円ぶん低い階層</strong>から始まります。`
+        ? `育休を取らなかった場合は ${fmt(firstNo.household)}円 なので、<strong>${fmt(d)}円ぶん低い階層</strong>から始まります。`
         : '');
   } else {
     $('care-callout').textContent = '';
@@ -899,6 +901,31 @@ function drawTables(house) {
 
 // ── 文章の部分 ────────────────────────────
 
+// 「父」と決め打ちにせず、呼び方の欄に入れたものを画面ぜんぶで使う。
+// 静的な HTML に名前を書くと、欄を変えたときにそこだけ古いままになる。
+function drawLabels() {
+  const mother = PEOPLE.find((p) => p.role === 'mother');
+  const father = PEOPLE.find((p) => p.role === 'father');
+
+  $('snap-note').innerHTML =
+    `${mother.label}は出産手当金、${father.label}は育児休業給付。` +
+    `<strong>どちらも税金がかからず、社会保険料も止まります。</strong>`;
+
+  $('net-legend').innerHTML =
+    `<span role="listitem"><i class="swatch s1"></i>${father.label}が育休を取る</span>` +
+    `<span role="listitem"><i class="swatch s2"></i>${father.label}が取らない</span>`;
+
+  $('net-chart').setAttribute('aria-label',
+    `毎月の世帯の手取りの動き。${father.label}が育休を取る場合と、取らない場合。`);
+
+  document.querySelector('#care-table .take-label').textContent = `${father.label}が育休を取る`;
+  document.querySelector('#care-table .skip-label').textContent = `${father.label}が取らない`;
+  document.querySelector('#year-table .take-caption').textContent =
+    `年ごと。${father.label}が育休を取る場合。`;
+  document.querySelector('#month-table caption').textContent =
+    `月ごと。${father.label}が育休を取る場合の、ふたり合わせた額です。`;
+}
+
 function drawProse(house) {
   const mother = PEOPLE.find((p) => p.role === 'mother');
   const father = PEOPLE.find((p) => p.role === 'father');
@@ -925,7 +952,7 @@ function drawProse(house) {
       `<div class="hc-main"><span class="hc-yen">${fmt(during)}<span class="hc-unit">円</span></span>` +
       (ratio != null ? `<span class="hc-ratio">ふだんの ${ratio}%</span>` : '') + `</div>` +
       `<div class="hc-sub">` +
-      `${father.label}が育休を取らないと ${fmt(withoutFather)}円 です。` +
+      `育休を取らない場合は ${fmt(withoutFather)}円 です。` +
       `${during >= withoutFather
           ? `<b>取ったほうが ${fmt(during - withoutFather)}円 多くなります。</b>`
           : `差は ${fmt(withoutFather - during)}円 です。`}` +
@@ -971,9 +998,9 @@ function drawProse(house) {
     facts.push({
       tag: 'ふたり分',
       head: `${father.label}が取ると、${mother.label}の給付も増えます`,
-      body: `13%の上乗せは<b>ふたりとも14日以上取ることが条件</b>なので、${father.label}が取らないと` +
-        `${mother.label}のぶんも出ません。ふたり合わせて <b>${fmt(mGain + fGain)}円</b>` +
-        `（${mother.label} ${fmt(mGain)}円 ／ ${father.label} ${fmt(fGain)}円）。`,
+      body: `13%の上乗せは<b>ふたりとも14日以上取ることが条件</b>です。` +
+        `取らない場合は${mother.label}のぶんも出ないので、ふたり合わせて <b>${fmt(mGain + fGain)}円</b>` +
+        `（${mother.label} ${fmt(mGain)}円 ／ ${father.label} ${fmt(fGain)}円）がここで決まります。`,
       good: true,
     });
   }
@@ -1084,7 +1111,7 @@ function drawProse(house) {
       `いちばん新しい源泉徴収票は ${w.year}年分の <strong>${man(w.paid)}</strong> です` +
       (p.role === 'father'
         ? `（育休を取らなければ ${man(no ? no.paid : 0)}）。`
-        : `。産休と育休で下がるので、父が育休を取るかどうかとは関係ありません。`) +
+        : `。産休と育休で下がるので、${nameOf('father')}が育休を取るかどうかとは関係ありません。`) +
       `</li>`
     ).join('') +
     `<li><strong><a href="#care-h">保育料</a></strong>。ふたりの住民税を足した数字で段階が決まります。</li>` +
@@ -1131,6 +1158,7 @@ function render() {
   const config = readConfig();
   const house = simulateHousehold(RULES, config);
   PEOPLE = peopleOf(house);
+  drawLabels();
   drawProse(house);
   drawNetChart(house);
   drawPayChart(house);

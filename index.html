@@ -44,11 +44,12 @@
       </fieldset>
 
       <fieldset class="person" data-role="father">
-        <legend>産休を取らないほう（父）</legend>
+        <legend>産休を取らないほう</legend>
         <div class="basic">
           <label>
             <span>呼び方</span>
-            <input type="text" class="p-label" value="父" maxlength="6">
+            <input type="text" class="p-label" value="あなた" maxlength="6">
+            <small>下の結果ぜんぶに使います。お名前でもかまいません</small>
           </label>
           <label>
             <span>月のお給料</span>
@@ -84,7 +85,7 @@
       </fieldset>
 
       <fieldset class="person" data-role="mother">
-        <legend>産休を取るほう（母）</legend>
+        <legend>産休を取るほう</legend>
         <p class="fixed-note">
           <strong>産後8週間は就業させてはならない</strong>ので（労基法65条）、ここは固定です。
         </p>
@@ -92,6 +93,7 @@
           <label>
             <span>呼び方</span>
             <input type="text" class="p-label" value="母" maxlength="6">
+            <small>下の結果ぜんぶに使います</small>
           </label>
           <label>
             <span>月のお給料</span>
@@ -142,9 +144,7 @@
   <!-- ── 毎月の手取り（いちばん先に知りたいこと） ─── -->
   <section aria-labelledby="snap-h">
     <h2 id="snap-h" class="section-lead">ふたりとも家にいるあいだ、世帯の手取りはこのくらいです</h2>
-    <p class="section-note">
-      母は出産手当金、父は育児休業給付。<strong>どちらも税金がかからず、社会保険料も止まります。</strong>
-    </p>
+    <p class="section-note" id="snap-note"></p>
     <div id="hero-cards" class="hero-cards"></div>
   </section>
 
@@ -159,14 +159,10 @@
     <h2 id="net-h">3年ぶんの動き</h2>
     <p class="note">産休に入ってから、母の復帰の2年後まで。ふたり合わせた手取りです。</p>
 
-    <div class="legend" role="list">
-      <span role="listitem"><i class="swatch s1"></i>父が育休を取る</span>
-      <span role="listitem"><i class="swatch s2"></i>父が取らない</span>
-    </div>
+    <div class="legend" role="list" id="net-legend"></div>
 
     <div class="chart-wrap">
-      <svg id="net-chart" class="chart" role="img"
-           aria-label="毎月の世帯の手取りの動き。父が育休を取る場合と、取らない場合。"></svg>
+      <svg id="net-chart" class="chart" role="img"></svg>
       <div class="tip" id="net-tip" hidden></div>
     </div>
 
@@ -281,8 +277,8 @@
             <tr>
               <th scope="col">保育料の期間</th>
               <th scope="col">どの年の<br><small>収入で決まるか</small></th>
-              <th scope="col">ふたり合わせて<br><small>父が育休を取る</small></th>
-              <th scope="col">ふたり合わせて<br><small>父が取らない</small></th>
+              <th scope="col">ふたり合わせて<br><small class="take-label"></small></th>
+              <th scope="col">ふたり合わせて<br><small class="skip-label"></small></th>
               <th scope="col">差</th>
             </tr>
           </thead>
@@ -448,7 +444,7 @@
       <summary>年ごとの表</summary>
       <div class="table-wrap">
         <table id="year-table">
-          <caption>年ごと。父が育休を取る場合。「書類に載る年収」はお給料とボーナスの合計で、給付金も出産手当金も入りません。</caption>
+          <caption><span class="take-caption"></span>「書類に載る年収」はお給料とボーナスの合計で、給付金も出産手当金も入りません。</caption>
           <thead></thead>
           <tbody></tbody>
         </table>
@@ -458,7 +454,7 @@
       <summary>月ごとの表</summary>
       <div class="table-wrap">
         <table id="month-table">
-          <caption>月ごと。父が育休を取る場合の、ふたり合わせた額です。</caption>
+          <caption class="month-caption"></caption>
           <thead>
             <tr>
               <th scope="col">年月</th>
