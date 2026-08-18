@@ -6,8 +6,13 @@
 <title>やすめる — 父が育休を取ると、お金はどうなるか</title>
 <meta name="description" content="父が育休を取ると世帯のお金はどう動くのか。母は産休から育休まで制度の上限まで取る前提で固定し、父の月数だけを動かして、前後3年分をまとめて見られます。">
 <link rel="stylesheet" href="style.css">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22%3E%3Crect width=%2232%22 height=%2232%22 rx=%228%22 fill=%22%232a78d6%22/%3E%3Cpath d=%22M8 20h4v4H8zM14 14h4v10h-4zM20 8h4v16h-4z%22 fill=%22%23fff%22/%3E%3C/svg%3E">
+<meta name="theme-color" content="#f4f4f2" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#121211" media="(prefers-color-scheme: dark)">
 </head>
 <body>
+
+<a class="skip-link" href="#snap-h">結果まで飛ぶ</a>
 
 <header class="head">
   <p class="brand">やすめる</p>
@@ -48,12 +53,12 @@
         <div class="basic">
           <label>
             <span>月のお給料</span>
-            <input type="number" class="p-salary" value="500000" min="0" step="10000" inputmode="numeric">
+            <span class="field"><input type="number" class="p-salary" value="500000" min="0" step="10000" inputmode="numeric"><b class="echo" aria-hidden="true"></b></span>
             <small>手取りではなく、引かれる前の額</small>
           </label>
           <label>
             <span>ボーナス（1年分）</span>
-            <input type="number" class="p-bonus" value="1500000" min="0" step="100000" inputmode="numeric">
+            <span class="field"><input type="number" class="p-bonus" value="1500000" min="0" step="100000" inputmode="numeric"><b class="echo" aria-hidden="true"></b></span>
             <small>6月と12月に半分ずつとして計算します</small>
           </label>
           <label class="wide">
@@ -62,6 +67,7 @@
             <output id="father-months-out">1か月</output>
             <small>赤ちゃんが生まれた日から。産後の回復期を支えるなら1か月は要ります</small>
           </label>
+          <p class="slider-echo wide" id="slider-echo"></p>
         </div>
         <details class="more">
           <summary>当てはまれば</summary>
@@ -87,12 +93,12 @@
         <div class="basic">
           <label>
             <span>月のお給料</span>
-            <input type="number" class="p-salary" value="400000" min="0" step="10000" inputmode="numeric">
+            <span class="field"><input type="number" class="p-salary" value="400000" min="0" step="10000" inputmode="numeric"><b class="echo" aria-hidden="true"></b></span>
             <small>手取りではなく、引かれる前の額</small>
           </label>
           <label>
             <span>ボーナス（1年分）</span>
-            <input type="number" class="p-bonus" value="1200000" min="0" step="100000" inputmode="numeric">
+            <span class="field"><input type="number" class="p-bonus" value="1200000" min="0" step="100000" inputmode="numeric"><b class="echo" aria-hidden="true"></b></span>
             <small>6月と12月に半分ずつとして計算します</small>
           </label>
         </div>
@@ -133,6 +139,8 @@
 
   <!-- ── 毎月の手取り（一番先に知りたいこと） ─── -->
   <section aria-labelledby="snap-h">
+    <!-- 入力で数字が入れ替わるので、読み上げにも一度だけ結果を渡す -->
+    <p class="sr-only" id="live-status" role="status" aria-live="polite"></p>
     <h2 id="snap-h" class="section-lead">二人とも家にいる間、世帯の手取りはこのくらいです</h2>
     <p class="section-note" id="snap-note"></p>
     <div id="hero-cards" class="hero-cards"></div>
@@ -143,6 +151,29 @@
     <h2 id="key-h" class="section-lead">先に知っておくと落ち着けること</h2>
     <div id="key-facts" class="key-facts"></div>
   </section>
+
+  <!-- ── 目次 ────────────────────────────
+       12画面ぶんある。何がどこにあるか分からないまま読ませない。
+       中身は繰り返さず、行き先だけを置く。 -->
+  <nav class="toc" aria-labelledby="toc-h">
+    <h2 id="toc-h">この下にあるもの</h2>
+    <ul>
+      <li><a href="#net-h">3年分の動き</a></li>
+      <li><a href="#pay-h">振り込みまでの間</a></li>
+      <li><a href="#paid-h">書類に載る年収</a></li>
+      <li><a href="#care-h">保育料</a></li>
+      <li><a href="#fs-h">ふるさと納税</a></li>
+      <li><a href="#stat-h">ほかの男性の取得</a></li>
+      <li><a href="#lim-h">収入で変わるもの</a></li>
+      <li class="toc-break" aria-hidden="true"></li>
+      <li><a href="#co-h">会社への助成</a></li>
+      <li><a href="#hogo-h">法律で守られていること</a></li>
+      <li><a href="#app-h">出す書類と期限</a></li>
+      <li><a href="#table-h">細かい数字</a></li>
+      <li><a href="#dis-h">できること・できないこと</a></li>
+    </ul>
+    <p class="fine">区切りから下は、入力で数字が動かない制度の話です。</p>
+  </nav>
 
   <!-- ── 手取りの推移 ───────────────────────── -->
   <section class="panel" aria-labelledby="net-h">
@@ -619,6 +650,20 @@
     いまは育児休業だけを扱っています。
   </p>
 </footer>
+
+<div class="sticky-bar" id="sticky-bar" hidden>
+  <div class="sb-inner">
+    <label class="sb-slider">
+      <span class="sb-cap">育休 <b id="sb-months-out">1か月</b></span>
+      <input type="range" id="sb-months" value="1" min="1" max="12" step="1"
+             aria-label="お父さまの育休の長さ（か月）">
+    </label>
+    <a class="sb-result" href="#snap-h">
+      <span class="sb-label">二人とも家にいる間</span>
+      <span class="sb-value" id="sb-value">—</span>
+    </a>
+  </div>
+</div>
 
 <script type="module" src="app.js"></script>
 </body>
