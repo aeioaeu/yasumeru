@@ -364,6 +364,10 @@ eq('母の入金までの空白（か月）', h.payments.mother.gapMonths, 3);
 eq('産休開始から最初の育休給付の入金まで',
   h.payments.mother.firstPayment.payAbs - absOfDate(sch.sankyu.start), 6);
 
+// 入金の額は、月ごとに畳んだ表示の合計と一致する。
+// どちらも育児休業給付金と出生後休業支援給付金をそれぞれ切り捨てて足しているため。
+eq('父の入金の合計は月ごとの合計と一致', h.payments.father.total, fatherBenefit);
+
 console.log('\n── 統計の区分 ──');
 
 // 父が1か月なら「1か月以上3か月未満」の区分に入る

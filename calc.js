@@ -446,6 +446,29 @@ export function residentTaxAnnual(rules, salaryIncome, shahoPaid) {
   };
 }
 
+/**
+ * 産休にも育休にも入っていない、ふつうの月の手取り（賞与を除く）。
+ *
+ * 「ふだんと比べてどうか」を出すのに使う。月ごとの計算と辻褄が合うように、
+ * 所得税は年額をその月の額面の比で按分し、住民税は年額の1/12を置く。
+ */
+export function normalMonthlyNet(rules, person) {
+  const {
+    monthlySalary, annualBonus, bonusMonths = [6, 12], isOver40 = false,
+  } = person;
+  const shaho = shahoMonthly(rules, monthlySalary, isOver40);
+  const bonusPer = bonusMonths.length ? annualBonus / bonusMonths.length : 0;
+  const annualPaid = monthlySalary * 12 + annualBonus;
+  if (annualPaid <= 0) return 0;
+  const annualShaho =
+    shaho.total * 12 + shahoBonus(rules, bonusPer, isOver40) * bonusMonths.length;
+
+  const it = incomeTaxAnnual(rules, annualPaid, annualShaho);
+  const rt = residentTaxAnnual(rules, annualPaid, annualShaho);
+  const incomeTax = yen((it.tax * monthlySalary) / annualPaid);
+  return yen(monthlySalary - shaho.total - incomeTax - rt.total / 12);
+}
+
 // ── 1人ぶんのシミュレーション ──────────────────
 
 /**
@@ -702,12 +725,19 @@ export function paymentSchedule(rules, { leaveStart, leaveEnd, monthlySalary, sh
     const uEnd = Math.min(addDays(addMonths(leaveStart, u + 1), -1), leaveEnd);
     const from = Math.round((uStart - leaveStart) / DAY_MS);
     const days = daysInclusive(uStart, uEnd);
-    let amount = 0;
+    // 育児休業給付金と出生後休業支援給付金は別々の給付金なので、
+    // それぞれ円未満を切り捨ててから足す。benefitByMonth と揃えてある。
+    let base = 0;
+    let extra = 0;
     for (let i = from; i < from + days; i++) {
-      amount += d * (i < k.rateSwitchDay ? k.rateHigh : k.rateLow);
-      if (i < shusseigoDays) amount += d * rules.shusseigo.rate;
+      base += d * (i < k.rateSwitchDay ? k.rateHigh : k.rateLow);
+      if (i < shusseigoDays) extra += d * rules.shusseigo.rate;
     }
-    units.push({ index: u, start: uStart, end: uEnd, days, amount: yen(amount) });
+    units.push({
+      index: u, start: uStart, end: uEnd, days,
+      benefit: yen(base), shusseigo: yen(extra),
+      amount: yen(base) + yen(extra),
+    });
     if (uEnd >= leaveEnd) break;
   }
 
@@ -1098,15 +1128,12 @@ export function simulateHousehold(rules, config) {
     fatherLeaveAbsList.push(abs);
   }
   const beforeAbs = startAbs - 1;
-  const beforeNet =
-    yen(mother.monthlySalary + father.monthlySalary) -
-    shahoMonthly(rules, mother.monthlySalary, mother.isOver40).total -
-    shahoMonthly(rules, father.monthlySalary, father.isOver40).total;
+  const normalNet = normalMonthlyNet(rules, mother) + normalMonthlyNet(rules, father);
 
   const duringMonths = months.filter((m) => fatherLeaveAbsList.includes(m.abs));
   const snapshot = {
     beforeAbs,
-    beforeNetRough: beforeNet,
+    normalNet,
     duringTake: duringMonths.length
       ? Math.round(duringMonths.reduce((a, m) => a + m.takeNetExBonus, 0) / duringMonths.length)
       : null,
