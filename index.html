@@ -50,29 +50,17 @@
     </label>
 
     <details class="more">
-      <summary>ボーナスと年齢も入れる</summary>
+      <summary>40歳以上のとき</summary>
       <div class="extras">
-        <div class="ex" data-role="father">
-          <p class="ex-who">お父さま</p>
-          <label class="f"><span>ボーナス（1年分）</span>
-            <input type="number" class="p-bonus" value="1500000" min="0" step="100000" inputmode="numeric"></label>
-          <label class="f"><span>育休中のボーナス（いつもの何%）</span>
-            <input type="number" class="p-bonus-rate" value="0" min="0" max="100" step="10" inputmode="numeric"></label>
-          <label class="check"><input type="checkbox" class="p-over40"><span>40歳以上</span></label>
-        </div>
-        <div class="ex" data-role="mother">
-          <p class="ex-who">お母さま</p>
-          <label class="f"><span>ボーナス（1年分）</span>
-            <input type="number" class="p-bonus" value="1200000" min="0" step="100000" inputmode="numeric"></label>
-          <label class="f"><span>育休中のボーナス（いつもの何%）</span>
-            <input type="number" class="p-bonus-rate" value="0" min="0" max="100" step="10" inputmode="numeric"></label>
-          <label class="check"><input type="checkbox" class="p-over40"><span>40歳以上</span></label>
-        </div>
+        <label class="check" data-role="father">
+          <input type="checkbox" class="p-over40"><span>お父さまが40歳以上</span></label>
+        <label class="check" data-role="mother">
+          <input type="checkbox" class="p-over40"><span>お母さまが40歳以上</span></label>
+        <p class="ex-note">
+          40歳から介護保険料がかかります。産後8週間は就業させてはならないので（労基法65条）、
+          お母さまの休みは固定です。
+        </p>
       </div>
-      <p class="ex-note">
-        産後8週間は就業させてはならないので（労基法65条）、お母さまの休みは固定です。
-        ボーナスは6月と12月に半分ずつとして計算します。
-      </p>
     </details>
   </section>
 
@@ -146,11 +134,12 @@
         <dd>自治体によって段階の区切りがかなり違うためです。</dd>
         <dt>ふるさと納税で寄付できる総額</dt>
         <dd>人によって控除の中身が違うためです。</dd>
-        <dt>育休中のボーナスの額</dt>
+        <dt>ボーナス</dt>
         <dd>
-          査定の期間が育休と重なったときの扱いは、会社ごとにかなり違います
-          （部署の平均にする、期間で割る、一律で減らす など）。決まったルールがないので、
-          いつもの何%かを入れてもらう形にしています。
+          <strong>いまは計算に入れていません。</strong>査定の期間が育休と重なったときの扱いは
+          会社ごとにかなり違い（部署の平均にする、期間で割る、一律で減らす など）、
+          決まったルールがありません。<strong>入力を1つ増やしても答えが確からしくならない</strong>ので、
+          出さないほうを選んでいます。ボーナスがある場合、住民税と所得税はここで出る額より重くなります。
         </dd>
         <dt>控除で税金がいくら減るか</dt>
         <dd>令和8年分の控除額の表がまだ公表されていないので、推測では出していません。</dd>
@@ -202,15 +191,14 @@
           <li>出産予定日どおりに生まれるものとして計算しています。</li>
           <li>母は産前6週・産後8週の産休のあと、育休を子が1歳になるまで取る前提です。保育園に入れないときの1歳6か月・2歳への延長は入れていません。</li>
           <li>父の育休は生まれた日から始まる前提です。あとから取る場合、出生後休業支援給付金（13%）の対象期間を外れることがあります。</li>
-          <li>産休・育休中はお給料もボーナスも出ない前提です（ボーナスは割合を入れれば計算に入ります）。</li>
+          <li><strong>ボーナスは計算に入れていません。</strong>お給料だけで見ています。</li>
+          <li>産休・育休中はお給料が出ない前提です。</li>
           <li>月の途中で休みに入る月のお給料は、暦の日数で日割りしています。社会保険料は標準報酬月額で決まるので、日割りしても月の額は変わりません。</li>
           <li>出産手当金は、標準報酬月額のかわりに月のお給料をそのまま使っています（等級表には当てはめていません）。</li>
           <li>扶養は考えず、基礎控除と社会保険料控除だけで計算しています。住宅ローン控除や医療費控除も入れていません。</li>
           <li>健康保険料は協会けんぽの全国平均です。令和8年度は 9.44%（沖縄）〜10.55%（佐賀）の幅があるので、お住まいの都道府県の実際の率とは少し違います。</li>
           <li>住民税は一人分・級地1を想定した目安です。均等割や非課税の基準は自治体で変わります。</li>
           <li>所得税は1年分を、その月の額面の比で割り付けています。毎月の給与から引かれる額とは一致しません。</li>
-          <li>育休中に出たボーナスは、給付金を減らす対象には入れていません。</li>
-          <li>ボーナスの社会保険料が免除になるのは、ボーナスの月の末日に休業中で、かつ休業が1か月を超えるときです。</li>
         </ul>
       </details>
       </details>

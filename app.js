@@ -15,18 +15,22 @@ const man = (n) => {
 // 直書きすると、変えたときにそこだけ古いまま残るので、必ずここから取る。
 const LABELS = { father: 'あなた', mother: 'パートナー' };
 
-// 月給は1画面目に、ボーナスと年齢は畳んだ中にある。
+// 月給は画面に、40歳以上は畳んだ中にある。
 // どちらも data-role で括ってあるので、役割で引けば場所を問わない。
+//
+// ボーナスは MVP では扱わない（0 で通す）。額そのものより、
+// 「休業中に出るのか・いくら出るのか」が会社ごとに違いすぎて、
+// 入力を1つ増やしても答えが確からしくならない。前提にそう書いてある。
 function readPerson(role) {
   const q = (cls) => document.querySelector(`[data-role="${role}"] ${cls}`);
   const num = (cls, dflt) => Math.max(0, Number(q(cls)?.value) || dflt);
   return {
     label: LABELS[role],
     monthlySalary: num('.p-salary', 0),
-    annualBonus: num('.p-bonus', 0),
+    annualBonus: 0,
     bonusMonths: [6, 12],
     isOver40: !!q('.p-over40')?.checked,
-    bonusRateDuringLeave: Math.min(1, Math.max(0, num('.p-bonus-rate', 0) / 100)),
+    bonusRateDuringLeave: 0,
   };
 }
 
