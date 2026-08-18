@@ -28,12 +28,16 @@ const dateJa = (d) =>
 
 let careStartOverride = null;
 
+// 画面に出す呼び方。入力欄は持たない（自分で名づけるものではない）。
+// 直書きすると、変えたときにそこだけ古いまま残るので、必ずここから取る。
+const LABELS = { father: 'あなた', mother: 'パートナー' };
+
 function readPerson(role) {
   const node = document.querySelector(`.person[data-role="${role}"]`);
   const q = (cls) => node.querySelector(cls);
   const num = (cls, dflt) => Math.max(0, Number(q(cls).value) || dflt);
   return {
-    label: (q('.p-label').value || '').trim() || (role === 'mother' ? '母' : '父'),
+    label: LABELS[role],
     monthlySalary: num('.p-salary', 0),
     annualBonus: num('.p-bonus', 0),
     bonusMonths: [6, 12],
@@ -92,6 +96,8 @@ function peopleOf(house) {
 
 // その月の、人ごとのセル
 const perOf = (m, sc) => PEOPLE.map((p) => ({ label: p.label, role: p.role, c: m[sc][p.role] }));
+// 呼び方の欄に入れたもの。画面に出す文字はここから取る（「父」と直書きしない）。
+const nameOf = (role) => (PEOPLE.find((p) => p.role === role) || {}).label || '';
 
 // ── SVG の小道具 ──────────────────────────
 
@@ -189,7 +195,7 @@ function drawNetChart(house) {
   const y = (v) => M.top + ph - (v / maxV) * ph;
 
   // 人ごとに休んでいる期間の帯。重なるところは濃くなる。
-  // 母は産休から、父は育休から。ふたりとも家にいるのは重なったところ。
+  // 母は産休から、父は育休から。二人とも家にいるのは重なったところ。
   PEOPLE.forEach((p) => {
     const x0 = x(Math.max(0, p.offStartAbs - startAbs));
     const x1 = x(Math.min(n - 1, p.returnAbs - startAbs));
@@ -199,7 +205,7 @@ function drawNetChart(house) {
   });
   svg.appendChild(el('text', {
     class: 'band-text', x: x(0) + 4, y: M.top - (narrow ? 34 : 40),
-  }, '休んでいる期間（濃いところはふたりとも）'));
+  }, '休んでいる期間（濃いところは二人とも）'));
 
   drawYAxis(svg, { M, pw, y, maxV, ticks: narrow ? 2 : 4, narrow });
   drawYearAxis(svg, { M, pw, ph, startAbs, n, x, narrow });
@@ -264,11 +270,11 @@ function drawNetChart(house) {
     svg.appendChild(el('text', {
       class: 'series-label s1', x: x(sepIdx) + ox,
       y: y(ms[sepIdx].takeNetExBonus) + (aHigher ? -10 : 20), 'text-anchor': anchor,
-    }, '父が育休を取る'));
+    }, `${nameOf('father')}が育休を取る`));
     svg.appendChild(el('text', {
       class: 'series-label s2', x: x(sepIdx) + ox,
       y: y(ms[sepIdx].skipNetExBonus) + (aHigher ? 20 : -10), 'text-anchor': anchor,
-    }, '父が取らない'));
+    }, `${nameOf('father')}が取らない`));
   }
 
   svg.appendChild(el('circle', { class: 'dot-1', cx: x(n - 1), cy: y(ms[n - 1].takeNetExBonus), r: 4 }));
@@ -296,8 +302,8 @@ function drawNetChart(house) {
       .map((x) => `${x.label}は${x.c.onSankyu && !x.c.onIkukyu ? '産休' : '育休'}`);
     tip.innerHTML =
       `<b>${m.year}年${m.month}月${off.length ? `（${off.join('・')}）` : ''}</b>` +
-      `<div class="row s1"><span><i></i>父が育休を取る</span><span>${fmt(m.takeNetExBonus)}円</span></div>` +
-      `<div class="row s2"><span><i></i>父が取らない</span><span>${fmt(m.skipNetExBonus)}円</span></div>` +
+      `<div class="row s1"><span><i></i>${nameOf('father')}が育休を取る</span><span>${fmt(m.takeNetExBonus)}円</span></div>` +
+      `<div class="row s2"><span><i></i>${nameOf('father')}が取らない</span><span>${fmt(m.skipNetExBonus)}円</span></div>` +
       (m.benefit > 0 ? `<div class="tip-note">育児休業給付の発生 ${fmt(m.benefit)}円（入金は別のタイミング）</div>` : '') +
       (m.teate > 0 ? `<div class="tip-note">出産手当金の発生 ${fmt(m.teate)}円</div>` : '') +
       `<div class="tip-note">住民税 ${fmt(m.residentTax)}円は${m.take.mother.residentTaxBaseYear}年の所得に対するもの</div>`;
@@ -414,8 +420,8 @@ function drawPaidCharts(house) {
     lead.className = 'note';
     lead.innerHTML = compare
       ? '育休を取ると、その年の支払金額が下がります。'
-      : `<strong>父が育休を取っても取らなくても同じです。</strong>` +
-        `母の産休と育休はどちらの場合も同じだけあるので、書類の上の年収はどちらでも下がります。`;
+      : `<strong>${nameOf('father')}が育休を取っても取らなくても同じです。</strong>` +
+        `${nameOf('mother')}の産休と育休はどちらの場合も同じだけあるので、書類の上の年収はどちらでも下がります。`;
     host.appendChild(lead);
 
     if (compare) {
@@ -532,10 +538,10 @@ function drawCare(house) {
   if (first && first.household != null && firstNo) {
     const d = firstNo.household - first.household;
     $('care-callout').innerHTML =
-      `保育がはじまる ${ym(house.careStartAbs)} の保育料は、<strong>${first.basisYear}年の所得</strong>で決まります。` +
+      `保育が始まる ${ym(house.careStartAbs)} の保育料は、<strong>${first.basisYear}年の所得</strong>で決まります。` +
       `${names}を合わせた所得割額は <strong>${fmt(first.household)}円</strong>。` +
       (d > 0
-        ? `父が育休を取らなかった場合は ${fmt(firstNo.household)}円 なので、<strong>${fmt(d)}円ぶん低い階層</strong>から始まります。`
+        ? `育休を取らなかった場合は ${fmt(firstNo.household)}円 なので、<strong>${fmt(d)}円分低い階層</strong>から始まります。`
         : '');
   } else {
     $('care-callout').textContent = '';
@@ -571,7 +577,7 @@ function drawFurusato(house) {
     tb.appendChild(tr);
   }
 
-  // いちばん枠が縮む人と年を拾う
+  // 一番枠が縮む人と年を拾う
   let worst = null;
   for (const p of PEOPLE) {
     for (const y of p.years) {
@@ -583,7 +589,7 @@ function drawFurusato(house) {
   }
   if (worst && worst.drop > 0) {
     $('fs-callout').innerHTML =
-      `いちばん縮むのは <strong>${worst.p.label}の${worst.y.year}年</strong>。` +
+      `一番縮むのは <strong>${worst.p.label}の${worst.y.year}年</strong>。` +
       `特例分の上限が ${fmt(worst.no.furusatoTokureiCap)}円 から ` +
       `<strong>${fmt(worst.y.furusatoTokureiCap)}円</strong> になります。` +
       `この年に例年どおり寄附すると、控除しきれない分がそのまま自己負担になります。`;
@@ -625,7 +631,7 @@ function drawStats(house) {
   const maleUnder3m = (Number(maleUnder1m) + m[3].male).toFixed(1);
   $('stat-dur-note').innerHTML =
     `男性は<strong>${maleUnder1m}% が1か月未満</strong>、${maleUnder3m}% が3か月未満です。` +
-    `「長く取らないといけない」という思い込みが、いちばん外れているところかもしれません。`;
+    `「長く取らないといけない」という思い込みが、一番外れているところかもしれません。`;
 
   const host = $('stat-charts');
   host.textContent = '';
@@ -659,7 +665,22 @@ function drawDurationChart(host, person) {
   const narrow = W < 560;
   const bs = T.durationBuckets;
   const rowH = narrow ? 22 : 24;
-  const M = { top: 8, right: narrow ? 44 : 56, bottom: 8, left: narrow ? 108 : 132 };
+
+  // 左の幅は区分名の長さしだいなので、実測して決める。決め打ちだと
+  // 「10か月〜12か月未満」が左で切れて「0か月〜12か月未満」に読めてしまう。
+  const probe = el('text', { class: 'axis-text', x: -999, y: -999 });
+  svg.appendChild(probe);
+  let labelW = 0;
+  for (const b of bs) {
+    probe.textContent = b.label;
+    labelW = Math.max(labelW, probe.getComputedTextLength() || 0);
+  }
+  probe.remove();
+
+  const M = {
+    top: 8, right: narrow ? 44 : 56, bottom: 8,
+    left: Math.min(Math.ceil(labelW) + 12, Math.round(W * 0.5)),
+  };
   const H = M.top + M.bottom + rowH * bs.length;
   svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
   const pw = W - M.left - M.right;
@@ -745,7 +766,7 @@ function drawLimits(house) {
   }
 }
 
-// ── 会社側のしくみ ────────────────────────
+// ── 会社側の仕組み ────────────────────────
 
 function drawCompany() {
   const k = RULES.kaisha;
@@ -766,7 +787,7 @@ function drawCompany() {
   $('co-source').innerHTML =
     `出典：<a href="${k.joseikin.url}" target="_blank" rel="noopener">${k.joseikin.org}「${k.joseikin.name}」</a>、` +
     `<a href="${k.ninshou.url}" target="_blank" rel="noopener">${k.ninshou.name}</a>。` +
-    `<strong>税金が安くなるしくみについては書いていません</strong>——` +
+    `<strong>税金が安くなる仕組みについては書いていません</strong>——` +
     `認定を受けた会社への上乗せがあるという話はありますが、` +
     `いま見直しの途中で、確かな資料で確認できなかったためです。`;
 }
@@ -899,15 +920,44 @@ function drawTables(house) {
 
 // ── 文章の部分 ────────────────────────────
 
+// 「父」と決め打ちにせず、呼び方の欄に入れたものを画面全部で使う。
+// 静的な HTML に名前を書くと、欄を変えたときにそこだけ古いままになる。
+function drawLabels() {
+  const mother = PEOPLE.find((p) => p.role === 'mother');
+  const father = PEOPLE.find((p) => p.role === 'father');
+
+  // 静的な文の中で人を指すところは、この2つのクラスで差し替える
+  document.querySelectorAll('.p-mother').forEach((e) => { e.textContent = mother.label; });
+  document.querySelectorAll('.p-father').forEach((e) => { e.textContent = father.label; });
+
+  $('snap-note').innerHTML =
+    `${mother.label}は出産手当金、${father.label}は育児休業給付。` +
+    `<strong>どちらも税金がかからず、社会保険料も止まります。</strong>`;
+
+  $('net-legend').innerHTML =
+    `<span role="listitem"><i class="swatch s1"></i>${father.label}が育休を取る</span>` +
+    `<span role="listitem"><i class="swatch s2"></i>${father.label}が取らない</span>`;
+
+  $('net-chart').setAttribute('aria-label',
+    `毎月の世帯の手取りの動き。${father.label}が育休を取る場合と、取らない場合。`);
+
+  document.querySelector('#care-table .take-label').textContent = `${father.label}が育休を取る`;
+  document.querySelector('#care-table .skip-label').textContent = `${father.label}が取らない`;
+  document.querySelector('#year-table .take-caption').textContent =
+    `年ごと。${father.label}が育休を取る場合。`;
+  document.querySelector('#month-table caption').textContent =
+    `月ごと。${father.label}が育休を取る場合の、二人合わせた額です。`;
+}
+
 function drawProse(house) {
   const mother = PEOPLE.find((p) => p.role === 'mother');
   const father = PEOPLE.find((p) => p.role === 'father');
   const sn = house.snapshot;
 
-  // ── ふたりとも家にいるあいだ、世帯の手取りはこのくらい ──
+  // ── 二人とも家にいる間、世帯の手取りはこのくらい ──
   //
-  // 父の育休は生まれた日から始まるので、そのあいだ母は産後休業中。
-  // この重なっている時期の世帯の手取りが、いちばん先に知りたいところ。
+  // 父の育休は生まれた日から始まるので、その間母は産後休業中。
+  // この重なっている時期の世帯の手取りが、一番先に知りたいところ。
   const overlap = house.months.filter(
     (m) => m.take.father.onIkukyu && m.take.mother.onLeave
   );
@@ -921,11 +971,11 @@ function drawProse(house) {
     const ratio = now > 0 ? Math.round((during / now) * 1000) / 10 : null;
     cards.push(
       `<div class="hero-card wide">` +
-      `<div class="hc-who">ふたりとも家にいるあいだ（月あたり・ボーナス除く）</div>` +
+      `<div class="hc-who">二人とも家にいる間（月あたり・ボーナス除く）</div>` +
       `<div class="hc-main"><span class="hc-yen">${fmt(during)}<span class="hc-unit">円</span></span>` +
-      (ratio != null ? `<span class="hc-ratio">ふだんの ${ratio}%</span>` : '') + `</div>` +
+      (ratio != null ? `<span class="hc-ratio">普段の ${ratio}%</span>` : '') + `</div>` +
       `<div class="hc-sub">` +
-      `${father.label}が育休を取らないと ${fmt(withoutFather)}円 です。` +
+      `育休を取らない場合は ${fmt(withoutFather)}円 です。` +
       `${during >= withoutFather
           ? `<b>取ったほうが ${fmt(during - withoutFather)}円 多くなります。</b>`
           : `差は ${fmt(withoutFather - during)}円 です。`}` +
@@ -939,7 +989,7 @@ function drawProse(house) {
       `<div class="hero-card">` +
       `<div class="hc-who">${mother.label}（産休中）</div>` +
       `<div class="hc-main"><span class="hc-yen">${fmt(teateAvg)}<span class="hc-unit">円</span></span></div>` +
-      `<div class="hc-sub">出産手当金。お給料のおよそ3分の2で、<b>税金がかからず社会保険料も止まります</b>。</div>` +
+      `<div class="hc-sub">出産手当金。お給料のおよそ3分の2です。</div>` +
       `</div>`
     );
   }
@@ -954,7 +1004,7 @@ function drawProse(house) {
       `<div class="hc-main"><span class="hc-yen">${fmt(fAvg)}<span class="hc-unit">円</span></span></div>` +
       `<div class="hc-sub">育児休業給付。` +
       (withShusseigo
-        ? `はじめの28日は出生後休業支援給付金が上乗せされて <b>80%（手取り10割相当）</b>です。`
+        ? `初めの28日は出生後休業支援給付金が上乗せされて <b>80%（手取り10割相当）</b>です。`
         : `給付率は67%です。`) +
       `</div></div>`
     );
@@ -969,26 +1019,24 @@ function drawProse(house) {
     const mGain = house.months.reduce((a, m) => a + m.take.mother.shusseigo, 0);
     const fGain = house.months.reduce((a, m) => a + m.take.father.shusseigo, 0);
     facts.push({
-      tag: 'ふたり分',
+      tag: '二人分',
       head: `${father.label}が取ると、${mother.label}の給付も増えます`,
-      body: `出生後休業支援給付金（13%の上乗せ）は、<b>ふたりとも14日以上取ることが条件</b>です。` +
-        `${father.label}が取らないと ${mother.label}のぶんも出ません。` +
-        `ふたり合わせて <b>${fmt(mGain + fGain)}円</b>（${mother.label} ${fmt(mGain)}円 ／ ${father.label} ${fmt(fGain)}円）が、` +
-        `${father.label}が取るかどうかで決まります。`,
+      body: `13%の上乗せは<b>二人とも14日以上取ることが条件</b>です。` +
+        `取らない場合は${mother.label}の分も出ないので、二人合わせて <b>${fmt(mGain + fGain)}円</b>` +
+        `（${mother.label} ${fmt(mGain)}円 ／ ${father.label} ${fmt(fGain)}円）がここで決まります。`,
       good: true,
     });
   }
 
-  // 入金の空白。母は産休から数えるので、ここがいちばん長い。
+  // 入金の空白。母は産休から数えるので、ここが一番長い。
   const g = mother.payments;
   if (g.firstPayment) {
     const fromOff = g.firstPayment.payAbs - mother.offStartAbs;
     facts.push({
       tag: '振り込み',
       head: `育児休業給付の最初の振り込みは ${ym(g.firstPayment.payAbs)}ごろ`,
-      body: `${mother.label}が産休に入る ${ym(mother.offStartAbs)} から数えると <b>${fromOff}か月</b>あきます。` +
-        `出産手当金も産後にまとめて申請するのが普通なので、そのあいだお給料も止まっています。` +
-        `ここは貯金でしのぐことになります。`,
+      body: `${mother.label}が産休に入る ${ym(mother.offStartAbs)} から数えると <b>${fromOff}か月</b>空きます。` +
+        `その間お給料も止まっているので、ここは貯金でしのぐことになります。`,
       warn: true,
     });
   }
@@ -1006,10 +1054,9 @@ function drawProse(house) {
   if (trap) {
     facts.push({
       tag: '住民税',
-      head: '休んでいるあいだも住民税は払い続けます',
-      body: `${trap.m.year}年${trap.m.month}月の${trap.who.label}は、お給料も社会保険料も所得税もゼロですが、` +
-        `住民税だけは <b>${fmt(trap.who.c.residentTax)}円</b> 引かれます。` +
-        `前の年の収入にかかる税なので、いま働いていなくても止まりません。`,
+      head: '休んでいる間も住民税は払い続けます',
+      body: `${trap.m.year}年${trap.m.month}月の${trap.who.label}は、お給料も社会保険料もゼロですが、` +
+        `住民税だけは <b>${fmt(trap.who.c.residentTax)}円</b> 引かれます。前の年の収入にかかる税だからです。`,
     });
   }
 
@@ -1023,7 +1070,7 @@ function drawProse(house) {
       tag: '住民税',
       head: `${ms[dropIdx].year}年${ms[dropIdx].month}月から住民税が下がります`,
       body: `月 ${fmt(ms[dropIdx - 1].residentTax)}円 が <b>${fmt(ms[dropIdx].residentTax)}円</b> に。` +
-        `収入が下がったぶんが、1年おくれてここで返ってきます。`,
+        `収入が下がった分が、1年遅れて返ってきます。`,
       good: true,
     });
   }
@@ -1031,11 +1078,10 @@ function drawProse(house) {
   const d = house.summary.diff;
   facts.push({
     tag: '3年で見ると',
-    head: `${father.label}が${sn.fatherLeaveMonths}か月取ると、ふたり合わせて ` +
+    head: `${father.label}が${sn.fatherLeaveMonths}か月取ると、二人合わせて ` +
       `${d < 0 ? man(Math.abs(d)) + ' 少なくなります' : man(d) + ' 多くなります'}`,
-    body: `${ym(house.timeline.startAbs)}から${house.summary.monthsShown}か月ぶんの合計です。` +
-      `取ると ${fmt(house.summary.takeTotal)}円、取らないと ${fmt(house.summary.skipTotal)}円。` +
-      `${mother.label}の産休と育休はどちらにも同じだけ入っているので、この差は${father.label}のぶんだけです。`,
+    body: `${ym(house.timeline.startAbs)}から${house.summary.monthsShown}か月分の合計です。` +
+      `取ると ${fmt(house.summary.takeTotal)}円、取らないと ${fmt(house.summary.skipTotal)}円。`,
   });
 
   $('key-facts').innerHTML = facts.map((f) =>
@@ -1045,27 +1091,33 @@ function drawProse(house) {
     `<div class="fact-body">${f.body}</div></div>`
   ).join('');
 
-  // ── 3年ぶんの動きの下の一文 ──
-  let text = '';
-  if (trap) {
-    const names = perOf(trap.m, 'take').filter((x) => x.c.onLeave).map((x) => x.label).join('・');
-    text += `${trap.m.year}年${trap.m.month}月は${names}が休んでいて、その分のお給料も社会保険料も所得税もゼロです。` +
-      `それでも住民税はふたり合わせて ${fmt(trap.m.residentTax)}円 引かれ続けます。前の年の収入にかかる税だからです。`;
-  }
+  // ── 3年分の動きの下の一文 ──
+  //
+  // ここは線の読み方だけを書く。「なぜ住民税だけ引かれ続けるのか」は
+  // 上のカードに一度だけ置いてあるので、ここでは繰り返さない。
+  const bottom = ms.reduce((a, m) => (m.takeNetExBonus < a.takeNetExBonus ? m : a));
+  const parts = [
+    `一番低くなるのは ${bottom.year}年${bottom.month}月で、二人合わせて ${fmt(bottom.takeNetExBonus)}円です。`,
+  ];
   if (dropIdx > 0 && dropAmt > 1000) {
-    text += ` 下がるのは ${ms[dropIdx].year}年${ms[dropIdx].month}月から。` +
-      `ふたり合わせて月 ${fmt(ms[dropIdx - 1].residentTax)}円 が ${fmt(ms[dropIdx].residentTax)}円 になります。`;
+    parts.push(`${ms[dropIdx].year}年${ms[dropIdx].month}月に一段上がるのは、住民税が下がるためです。`);
   }
-  $('net-callout').textContent = text;
+  const bottomIdx = ms.indexOf(bottom);
+  const back = ms.slice(bottomIdx + 1).find((m) => m.takeNetExBonus >= sn.normalNet);
+  if (back) {
+    parts.push(`普段の水準に戻るのは ${back.year}年${back.month}月ごろです。`);
+  }
+  $('net-callout').textContent = parts.join('');
 
   // ── 振り込みの呼びかけ ──
   if (g.firstPayment) {
     const fromOff = g.firstPayment.payAbs - mother.offStartAbs;
     $('pay-callout').innerHTML =
-      `${mother.label}が産休に入るのは ${ym(mother.offStartAbs)}、育休に入るのは ${ym(mother.leaveStartAbs)}。` +
-      `育児休業給付の最初の振り込みは <strong>${ym(g.firstPayment.payAbs)}ごろ</strong>で ${fmt(g.firstPayment.amount)}円です。` +
-      `<strong>産休に入ってから ${fromOff}か月、育休に入ってから ${g.gapMonths}か月あきます。</strong>` +
-      `お給料も止まっているので、この期間ぶんは手元に用意しておくと安心です。`;
+      `${mother.label}は ${ym(mother.offStartAbs)} に産休、${ym(mother.leaveStartAbs)} に育休へ入り、` +
+      `育児休業給付の最初の振り込みは <strong>${ym(g.firstPayment.payAbs)}ごろ</strong>、` +
+      `${fmt(g.firstPayment.amount)}円です（育休に入ってから ${g.gapMonths}か月）。` +
+      `産休に入ってからだと ${fromOff}か月です。` +
+      `<strong>この空白の間の生活費</strong>は、手元に用意しておくと安心です。`;
   } else {
     $('pay-callout').textContent = '';
   }
@@ -1079,14 +1131,15 @@ function drawProse(house) {
   $('who-list').innerHTML =
     perWorst.map(({ p, w, no }) =>
       `<li><strong>住宅ローンの審査（${p.label}）</strong>。${w.year + 1}年に申し込むと、` +
-      `いちばん新しい源泉徴収票は ${w.year}年分の <strong>${man(w.paid)}</strong> です` +
+      `一番新しい源泉徴収票は ${w.year}年分の <strong>${man(w.paid)}</strong> です` +
       (p.role === 'father'
         ? `（育休を取らなければ ${man(no ? no.paid : 0)}）。`
-        : `。産休と育休で下がるので、父が育休を取るかどうかとは関係ありません。`) +
+        : `。産休と育休で下がるので、${nameOf('father')}が育休を取るかどうかとは関係ありません。`) +
       `</li>`
     ).join('') +
-    `<li><strong>保育料</strong>。ふたりの住民税を足した数字で段階が決まります。下にまとめています。</li>` +
-    `<li><strong>児童手当は収入で変わりません</strong>（2024年10月に所得制限がなくなりました）。</li>`;
+    `<li><strong><a href="#care-h">保育料</a></strong>。二人の住民税を足した数字で段階が決まります。</li>` +
+    `<li><strong>児童手当は収入で変わりません</strong>（2024年10月に所得制限がなくなりました）。` +
+    `ほかの制度は<a href="#lim-h">収入で変わるもの、変わらないもの</a>にまとめています。</li>`;
 
   // ── 健康診断・団信の出典 ──
   $('kenshin-source').innerHTML =
@@ -1103,7 +1156,7 @@ function drawProse(house) {
   }
   unverified.push(
     '住民税の調整控除で使う「人的控除の差」を5万円としています。' +
-    '令和8年度の改正でふえた基礎控除の分は、この差には反映されない前提です。'
+    '令和8年度の改正で増えた基礎控除の分は、この差には反映されない前提です。'
   );
   $('unverified').innerHTML = `<strong>確かめきれていないこと</strong>：${unverified.join(' ')}`;
 
@@ -1114,7 +1167,7 @@ function drawProse(house) {
     `<span class="org">（${s.org}）</span><span class="covers">${s.covers}</span></li>`
   ).join('');
 
-  // ── 保育をはじめる月 ──
+  // ── 保育を始める月 ──
   const c = fromAbs(house.careStartAbs);
   $('care-start').value = `${c.year}-${String(c.month).padStart(2, '0')}`;
   const def = fromAbs(house.defaultCareStartAbs);
@@ -1128,6 +1181,7 @@ function render() {
   const config = readConfig();
   const house = simulateHousehold(RULES, config);
   PEOPLE = peopleOf(house);
+  drawLabels();
   drawProse(house);
   drawNetChart(house);
   drawPayChart(house);
@@ -1163,6 +1217,20 @@ $('care-reset').addEventListener('click', () => {
   render();
 });
 
+// 説明は details に畳んである。リンクの飛び先がその中にあるときは開く。
+function revealHash() {
+  const id = decodeURIComponent(location.hash.slice(1));
+  if (!id) return;
+  const target = document.getElementById(id);
+  if (!target) return;
+  for (let el = target; el; el = el.parentElement) {
+    if (el.tagName === 'DETAILS') el.open = true;
+  }
+  if (target.tagName === 'DETAILS') target.open = true;
+  target.scrollIntoView({ block: 'start' });
+}
+window.addEventListener('hashchange', revealHash);
+
 let resizeTimer;
 window.addEventListener('resize', () => {
   document.querySelectorAll('.tip').forEach((t) => { t.hidden = true; });
@@ -1171,4 +1239,5 @@ window.addEventListener('resize', () => {
 });
 
 render();
+revealHash();
 void childcareBasisYear;
