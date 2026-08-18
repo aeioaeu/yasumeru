@@ -13,7 +13,7 @@
 
   --text-primary:   #0b0b0b;
   --text-secondary: #52514e;
-  --text-muted:     #77766f;
+  --text-muted:     #6b6a63;
 
   --series-1: #2a78d6;    /* 育休を取る */
   --series-2: #eb6834;    /* 取らない */
@@ -21,6 +21,10 @@
 
   --grid: #e4e4e0;
   --accent-soft: rgba(42, 120, 214, 0.10);
+
+  /* 文字として置く青。--series-1 は線と面の色で、明るい地の上では
+     小さい文字に足りない（4.0:1）。リンクと小見出しはこちらを使う。 */
+  --link: #1f68c4;
 
   --radius: 10px;
   --maxw: 860px;
@@ -46,6 +50,7 @@
 
     --grid: #2b2b28;
     --accent-soft: rgba(57, 135, 229, 0.16);
+    --link: #4d94ea;
   }
 }
 
@@ -68,6 +73,7 @@
 
   --grid: #2b2b28;
   --accent-soft: rgba(57, 135, 229, 0.16);
+  --link: #4d94ea;
 }
 
 * { box-sizing: border-box; }
@@ -394,7 +400,7 @@ tbody tr.on-leave { background: var(--accent-soft); }
 
 .sources { margin: 0; padding-left: 1.1rem; }
 .sources li { font-size: .8125rem; color: var(--text-secondary); margin-bottom: .6rem; }
-.sources a { color: var(--series-1); }
+.sources a { color: var(--link); }
 .sources .org { color: var(--text-muted); }
 .sources .covers { display: block; color: var(--text-muted); font-size: .75rem; }
 
@@ -663,7 +669,7 @@ li.soft { color: var(--text-muted); }
   font-size: 1.1rem;
   font-weight: 800;
   letter-spacing: .22em;
-  color: var(--series-1);
+  color: var(--link);
 }
 
 .purpose {
@@ -682,7 +688,7 @@ li.soft { color: var(--text-muted); }
   color: var(--text-secondary);
 }
 .disclaimer-top strong { color: var(--text-primary); }
-.disclaimer-top a { color: var(--series-1); }
+.disclaimer-top a { color: var(--link); }
 
 .panel.disclaimer { border-left: 3px solid var(--series-2); }
 /* 3つのまとまり（当てはまらない場合／出していないもの／差が出ないもの）は
@@ -804,7 +810,7 @@ details.more > summary {
   align-items: center;
   gap: .3rem;
   font-size: .8125rem;
-  color: var(--series-1);
+  color: var(--link);
   padding: .5rem 0;
   min-height: 40px;           /* 指で押せる大きさ */
 }
@@ -1009,7 +1015,7 @@ ul.apps li .amt {
 /* 「どうしてそうなるか」。数字を見てから読みたい人だけが開く */
 details.why { margin-top: .85rem; }
 details.why > summary {
-  color: var(--series-1);
+  color: var(--link);
   font-size: .8125rem;
 }
 details.why > .note:first-of-type { margin-top: .45rem; }
@@ -1057,4 +1063,367 @@ details.why > .note:first-of-type { margin-top: .45rem; }
     color: var(--text-primary);
   }
   #limit-table td:nth-child(2) { font-size: .8125rem; margin: .1rem 0 .2rem; }
+}
+
+
+/* ═══════════════════════════════════════════════════════
+   UX の見直しで入れたもの
+   ─────────────────────────────────────────────────────
+   1. 動かせるものが常に手元にあること（.sticky-bar）
+   2. 入れた数字がそのまま読めること（.echo / .slider-echo）
+   3. 指でも押せること（当たり判定 24px 以上）
+   4. 動きと印刷とキーボードの取りこぼしを塞ぐ
+   ═══════════════════════════════════════════════════════ */
+
+:root {
+  --focus: var(--series-1);
+  --bar-h: 0px;   /* .sticky-bar が出ている間だけ JS が上書きする */
+}
+
+/* ── キーボード ───────────────────────
+   フォーカスの見え方を1か所に集める。:where() で詳細度を0にしてあるので、
+   個別に書いてある既存の指定はそのまま勝つ。 */
+:where(a, button, summary, input, select, [tabindex]):focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* 本文のリンクは既定の色のままだった。暗い地では地の色に沈むし、
+   明るい地では #0000EE が palette から浮く。1つの色に寄せる。 */
+a { color: var(--link); }
+a:visited { color: var(--link); }
+
+/* 読み上げにだけ渡すもの */
+.sr-only {
+  position: absolute;
+  width: 1px; height: 1px;
+  margin: -1px; padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* 入力欄を飛ばして結果へ。普段は見えない */
+.skip-link {
+  position: absolute;
+  left: .5rem;
+  top: -4rem;
+  z-index: 60;
+  padding: .6rem .9rem;
+  background: var(--surface-1);
+  color: var(--text-primary);
+  border: 1px solid var(--border-strong);
+  border-radius: 6px;
+  font-size: .875rem;
+  text-decoration: none;
+}
+.skip-link:focus-visible { top: .5rem; }
+
+/* 節へのリンクが見出しの上端ぴったりで止まると、何に飛んだか分からない */
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 1rem;
+  scroll-padding-bottom: calc(var(--bar-h) + 1rem);
+}
+
+/* ── 入れた数字をそのまま読めるように ────────
+   500000 は桁を数えないと読めない。普段は「50万円」で考えている。 */
+.field {
+  display: flex;
+  align-items: center;
+  gap: .45rem;
+}
+.field > input { flex: 1 1 auto; min-width: 0; }
+.echo {
+  flex: none;
+  font-size: .8125rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+.echo:empty { display: none; }
+
+/* ── スライダーのすぐ下に結果を置く ──────────
+   動かした先の数字が画面の外だと、動かす意味が分からない。 */
+.slider-echo {
+  grid-column: 1 / -1;
+  margin: .1rem 0 0;
+  padding: .55rem .7rem;
+  background: var(--accent-soft);
+  border-radius: 8px;
+  font-size: .8125rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+.slider-echo b {
+  color: var(--text-primary);
+  font-size: 1.0625rem;
+  font-variant-numeric: tabular-nums;
+}
+.slider-echo:empty { display: none; }
+
+/* ── 指で押せる大きさ ─────────────────
+   WCAG 2.2 の 24px と、iOS/Android の 44/48 を見て、当たり判定を広げる。
+   見た目の大きさは変えず、押せる範囲だけ伸ばす。 */
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 44px;         /* 当たり判定。線は ::-webkit-slider-runnable-track で描く */
+  margin: 0;
+  background: transparent;
+  cursor: pointer;
+  touch-action: pan-y;  /* 縦のスワイプはページのスクロールに渡す */
+}
+input[type="range"]::-webkit-slider-runnable-track {
+  height: 6px;
+  border-radius: 3px;
+  background: var(--border-strong);
+}
+input[type="range"]::-moz-range-track {
+  height: 6px;
+  border-radius: 3px;
+  background: var(--border-strong);
+}
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 26px; height: 26px;
+  margin-top: -10px;
+  border-radius: 50%;
+  background: var(--series-1);
+  border: 2px solid var(--surface-1);
+  box-shadow: 0 1px 3px rgb(0 0 0 / .25);
+}
+input[type="range"]::-moz-range-thumb {
+  width: 26px; height: 26px;
+  border: 2px solid var(--surface-1);
+  border-radius: 50%;
+  background: var(--series-1);
+  box-shadow: 0 1px 3px rgb(0 0 0 / .25);
+}
+
+/* チェックボックスは既定だと13px。押せる範囲ごと広げる */
+.person label.check,
+.inputs label.check {
+  align-items: center;
+  min-height: 44px;
+}
+.person label.check input,
+.inputs label.check input,
+.legend-check input,
+.person > legend > .legend-check > input {
+  width: 24px;
+  height: 24px;
+  margin-top: 0;
+  accent-color: var(--series-1);
+}
+.legend-check,
+.person > legend > .legend-check { min-height: 44px; }
+
+/* 畳んである見出しは、この画面で一番よく押される */
+summary {
+  min-height: 44px;
+  align-items: center;
+}
+
+button.ghost, #care-reset {
+  min-height: 44px;
+  cursor: pointer;
+}
+
+/* ── 目次 ────────────────────────────
+   縦に12画面ある。どこに何があるか分からないまま読ませない。 */
+.toc {
+  margin: 1.75rem 0 1rem;
+  padding: 1rem 1.1rem 1.1rem;
+  background: var(--surface-1);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+.toc h2 {
+  font-size: .8125rem;
+  color: var(--text-secondary);
+  letter-spacing: .04em;
+  margin: 0 0 .6rem;
+}
+.toc ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .4rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.toc a {
+  display: flex;
+  align-items: center;
+  min-height: 36px;
+  padding: 0 .7rem;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--surface-0);
+  color: var(--text-secondary);
+  font-size: .8125rem;
+  text-decoration: none;
+}
+.toc a:hover { border-color: var(--border-strong); color: var(--text-primary); }
+.toc li.toc-break { flex-basis: 100%; height: 0; margin: .15rem 0; }
+.toc .fine { margin-top: .7rem; }
+
+/* ── 画面の底に残す操作 ────────────────
+   動かせるのは父の育休の月数だけ。それが入力欄まで戻らないと触れないのは、
+   この道具の芯が届いていないのと同じ。
+   出すのは手取りで、差額は出さない（差額を入口にしない方針と揃える）。 */
+.sticky-bar {
+  position: fixed;
+  left: 0; right: 0; bottom: 0;
+  z-index: 50;
+  background: color-mix(in srgb, var(--surface-1) 92%, transparent);
+  backdrop-filter: blur(8px);
+  border-top: 1px solid var(--border-strong);
+  padding: .5rem 1rem calc(.5rem + env(safe-area-inset-bottom));
+}
+.sticky-bar[hidden] { display: none; }
+.sb-inner {
+  max-width: var(--maxw);
+  margin-inline: auto;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+.sb-slider {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+.sb-cap {
+  font-size: .75rem;
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+.sb-cap b {
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+}
+.sb-slider input[type="range"] { height: 36px; }
+.sb-result {
+  flex: none;
+  text-align: right;
+  text-decoration: none;
+  color: inherit;
+  display: block;
+  padding: .2rem 0 .2rem .5rem;
+}
+.sb-label {
+  display: block;
+  font-size: .7rem;
+  color: var(--text-muted);
+}
+.sb-value {
+  display: block;
+  font-size: 1.0625rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-primary);
+  white-space: nowrap;
+}
+@media (max-width: 380px) {
+  .sb-inner { gap: .6rem; }
+  .sb-value { font-size: .9375rem; }
+}
+
+/* バーの下に本文が隠れないように、その高さだけ足す */
+body { padding-bottom: calc(4rem + var(--bar-h)); }
+
+/* スライダーは「値」と一組で読むもの。縦に離すと目が往復する。
+   ラベル行の右端に値を置いて、線はその下いっぱいに伸ばす。 */
+.person label.wide {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: baseline;
+  column-gap: .5rem;
+}
+.person label.wide > span { grid-column: 1; grid-row: 1; }
+.person label.wide > output {
+  grid-column: 2; grid-row: 1;
+  text-align: right;
+}
+.person label.wide > input[type="range"],
+.person label.wide > small { grid-column: 1 / -1; }
+
+/* いまどのあたりかを線の色で出す（--fill は JS が入れる） */
+input[type="range"]::-webkit-slider-runnable-track {
+  background: linear-gradient(to right,
+    var(--series-1) var(--fill, 0%), var(--border-strong) var(--fill, 0%));
+}
+input[type="range"]::-moz-range-track {
+  background: linear-gradient(to right,
+    var(--series-1) var(--fill, 0%), var(--border-strong) var(--fill, 0%));
+}
+
+/* ── グラフを指でも読めるように ──────────
+   当たり判定の上で縦にスワイプしたらページが動くこと。
+   横のなぞりだけツールチップに渡す。 */
+.chart .hit,
+.chart .bar-hit { touch-action: pan-y; }
+
+/* ── 動きを止めたい人へ ─────────────── */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+  }
+}
+
+/* ── 印刷 ────────────────────────────
+   相手や勤務先と見るために刷ることがある。
+   畳んである details は JS が印刷前に開く。ここでは邪魔なものを外す。 */
+@media print {
+  .sticky-bar, .skip-link, .toc, .input-hint, .tip { display: none !important; }
+  body {
+    padding: 0;
+    background: #fff;
+    color: #000;
+    font-size: 10.5pt;
+    line-height: 1.5;
+  }
+  .panel, .hero-card, .fact, .toc {
+    break-inside: avoid;
+    background: #fff;
+    border: 1px solid #bbb;
+    box-shadow: none;
+  }
+  section, table, .chart-wrap { break-inside: avoid; }
+  h2 { break-after: avoid; }
+  a { color: #000; text-decoration: underline; }
+  .table-wrap { overflow: visible; }
+  summary { list-style: none; font-weight: 700; color: #000; }
+}
+
+/* ── 最初の画面を、道具のぶんだけ空ける ────────
+   目的の一文と免責が箱で並んでいて、入力に着くまでに1画面近く使っていた。
+   免責は消さない（消してよい種類の文ではない）。箱をやめて1行に落とす。 */
+.disclaimer-top {
+  margin: .5rem 0 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  font-size: .8125rem;
+  line-height: 1.6;
+}
+.head { padding-bottom: 1rem; }
+.purpose { margin-bottom: 0; }
+@media (max-width: 480px) {
+  .head { padding: 1.25rem 0 .75rem; }
+  h1 { font-size: clamp(1.35rem, 5.6vw, 1.9rem); line-height: 1.35; }
+  .purpose { font-size: .9375rem; }
+  .input-panel { padding-top: 1rem; }
 }

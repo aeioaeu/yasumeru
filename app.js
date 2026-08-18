@@ -32,6 +32,10 @@ let careStartOverride = null;
 // 直書きすると、変えたときにそこだけ古いまま残るので、必ずここから取る。
 const LABELS = { father: 'あなた', mother: 'パートナー' };
 
+// 一番先に出している額。スライダーの下と画面の底のバーでも同じ数字を使う。
+// 二度計算せず、drawProse が出したものをそのまま配る。
+let SNAP = { during: null, ratio: null };
+
 function readPerson(role) {
   const node = document.querySelector(`.person[data-role="${role}"]`);
   const q = (cls) => node.querySelector(cls);
@@ -163,6 +167,28 @@ function drawYearAxis(svg, { M, pw, ph, startAbs, n, x, narrow }) {
     }
   }
 }
+
+// ホバーだけに載せると、指では一生出せない。
+// この画面はスマホで読まれる前提なので、タップでも出す。
+function hideTips(except) {
+  document.querySelectorAll('.tip').forEach((t) => { if (t !== except) t.hidden = true; });
+}
+
+function bindTip(hit, tip, show) {
+  hit.addEventListener('mouseenter', show);
+  hit.addEventListener('mouseleave', () => { tip.hidden = true; });
+  hit.addEventListener('pointerdown', (e) => {
+    if (e.pointerType === 'mouse') return;   // マウスは mouseenter が拾う
+    hideTips(tip);
+    show();
+  });
+}
+
+// グラフの外を触ったら消す
+document.addEventListener('pointerdown', (e) => {
+  const t = e.target;
+  if (!(t instanceof Element) || !t.closest('.chart-wrap')) hideTips();
+}, true);
 
 function placeTip(tip, svg, xInView, W, top = 8) {
   const r = svg.getBoundingClientRect();
@@ -309,12 +335,17 @@ function drawNetChart(house) {
       `<div class="tip-note">住民税 ${fmt(m.residentTax)}円は${m.take.mother.residentTaxBaseYear}年の所得に対するもの</div>`;
     placeTip(tip, svg, x(i), W);
   };
-  hit.addEventListener('mousemove', move);
-  hit.addEventListener('touchmove', (e) => { move(e); e.preventDefault(); }, { passive: false });
-  hit.addEventListener('mouseleave', () => {
+  const hide = () => {
     tip.hidden = true;
     cursor.setAttribute('opacity', 0);
-  });
+  };
+  hit.addEventListener('mousemove', move);
+  // 縦のスワイプはページのスクロールに渡す（CSS の touch-action: pan-y）。
+  // 以前は preventDefault していたので、グラフの上で指が止まっていた。
+  hit.addEventListener('pointerdown', (e) => { hideTips(tip); move(e); });
+  hit.addEventListener('pointermove', (e) => { if (e.pointerType !== 'mouse') move(e); });
+  hit.addEventListener('mouseleave', hide);
+  hit.addEventListener('pointercancel', hide);
 }
 
 // ── 入金（棒・人ごと） ──────────────────────
@@ -379,14 +410,13 @@ function drawPayChart(house) {
       const hit = el('rect', {
         class: 'hit', x: cx - 4, y: M.top, width: barW + 8, height: ph,
       });
-      hit.addEventListener('mouseenter', () => {
+      bindTip(hit, tip, () => {
         tip.innerHTML =
           `<b>${ym(pay.payAbs)}ごろ・${p.label}</b>` +
           `<div class="row"><span>入金</span><span>${fmt(pay.amount)}円</span></div>` +
           `<div class="tip-note">対象は ${pay.covers.map((c) => `${c.year}年${c.month}月`).join(' と ')} の分</div>`;
         placeTip(tip, svg, x(i), W, 4);
       });
-      hit.addEventListener('mouseleave', () => { tip.hidden = true; });
       svg.appendChild(hit);
     });
   });
@@ -491,7 +521,7 @@ function drawPaidCharts(house) {
       }, narrow ? `'${String(rowA.year).slice(2)}` : `${rowA.year}年`));
 
       const hit = el('rect', { class: 'hit', x: cx - slot / 2, y: M.top, width: slot, height: ph });
-      hit.addEventListener('mouseenter', () => {
+      bindTip(hit, tip, () => {
         const nonTaxable = rowA.benefit + rowA.teate;
         const names = [rowA.benefit > 0 && '育児休業給付', rowA.teate > 0 && '出産手当金']
           .filter(Boolean).join('と');
@@ -506,7 +536,6 @@ function drawPaidCharts(house) {
             : '');
         placeTip(tip, svg, cx, W, 4);
       });
-      hit.addEventListener('mouseleave', () => { tip.hidden = true; });
       svg.appendChild(hit);
     });
   });
@@ -964,11 +993,13 @@ function drawProse(house) {
   const avg = (arr, f) => (arr.length ? Math.round(arr.reduce((a, m) => a + f(m), 0) / arr.length) : 0);
 
   const cards = [];
+  SNAP = { during: null, ratio: null };
   if (overlap.length) {
     const now = sn.normalNet;
     const during = avg(overlap, (m) => m.takeNetExBonus);
     const withoutFather = avg(overlap, (m) => m.skipNetExBonus);
     const ratio = now > 0 ? Math.round((during / now) * 1000) / 10 : null;
+    SNAP = { during, ratio };
     cards.push(
       `<div class="hero-card wide">` +
       `<div class="hc-who">二人とも家にいる間（月あたり・ボーナス除く）</div>` +
@@ -1175,6 +1206,97 @@ function drawProse(house) {
     `そのままだと、あとに復帰するほうに合わせて ${def.year}年${def.month}月からになります`;
 }
 
+// ── 操作のまわり ──────────────────────────
+//
+// この道具で動かせるのは父の育休の月数だけ。
+// なのに動かした先の数字は画面の外にあって、しかも縦に12画面ある。
+// 「動かす」と「結果を見る」を離さないための3つ。
+
+// 1. 入れた金額を、普段使っている単位で返す。500000 は桁を数えないと読めない。
+function drawAmountEchoes() {
+  document.querySelectorAll('.person').forEach((node) => {
+    node.querySelectorAll('.p-salary, .p-bonus').forEach((input) => {
+      const echo = input.parentElement.querySelector('.echo');
+      if (!echo) return;
+      const v = Number(input.value);
+      echo.textContent = v > 0 ? man(v) : '';
+    });
+  });
+}
+
+// 2. スライダーのすぐ下に結果を出す。動かしても数字が見えないなら、動かす意味が分からない。
+// 3. 画面の底に同じスライダーと同じ数字を残す。読み進めた先からでも試せるように。
+//    出すのは手取り。差額は入口にしない方針なので、ここにも置かない。
+function drawControls(house, months) {
+  const father = PEOPLE.find((p) => p.role === 'father');
+  const echo = $('slider-echo');
+  const bar = $('sticky-bar');
+
+  if (SNAP.during == null) {
+    echo.textContent = '';
+    $('sb-value').textContent = '—';
+    return;
+  }
+
+  const ratio = SNAP.ratio != null ? `（普段の ${SNAP.ratio}%）` : '';
+  echo.innerHTML =
+    `${months}か月にすると、二人とも家にいる間の世帯の手取りは ` +
+    `<b>${fmt(SNAP.during)}円</b>／月 ${ratio}`;
+
+  $('sb-months').value = months;
+  $('sb-months-out').textContent = `${months}か月`;
+
+  // 線のどのあたりにいるかを色で出す
+  const fill = `${((months - 1) / 11) * 100}%`;
+  $('father-months').style.setProperty('--fill', fill);
+  $('sb-months').style.setProperty('--fill', fill);
+  $('sb-value').textContent = `${fmt(SNAP.during)}円`;
+  bar.querySelector('.sb-label').textContent = '二人とも家にいる間';
+
+  // 読み上げには、変わった結果を一文だけ渡す（数字だけ読み上げても意味にならない）
+  $('live-status').textContent =
+    `${father.label}の育休は${months}か月。` +
+    `二人とも家にいる間の世帯の手取りは、月およそ ${fmt(SNAP.during)}円です。`;
+}
+
+// 入力欄が画面から出たら、底のバーを出す。入力欄が見えている間は要らない。
+// バーは position: fixed なので、その高さぶんを本文の下に空ける（--bar-h）。
+function setBarHeight() {
+  const bar = $('sticky-bar');
+  document.documentElement.style.setProperty(
+    '--bar-h', bar.hidden ? '0px' : `${bar.offsetHeight}px`
+  );
+}
+
+function watchInputPanel() {
+  const panel = document.querySelector('.input-panel');
+  const bar = $('sticky-bar');
+  if (!panel || !('IntersectionObserver' in window)) return;
+
+  new IntersectionObserver(([e]) => {
+    bar.hidden = e.isIntersecting || e.boundingClientRect.top >= 0;
+    setBarHeight();
+  }, { threshold: 0 }).observe(panel);
+}
+
+// 底のバーのスライダーは、入力欄のスライダーと同じものを指している
+$('sb-months').addEventListener('input', (e) => {
+  $('father-months').value = e.target.value;
+  careStartOverride = null;
+  render();
+});
+
+// 相手や勤務先と見るために刷ることがある。畳んだままでは白紙が出る。
+let reopenAfterPrint = [];
+window.addEventListener('beforeprint', () => {
+  reopenAfterPrint = [...document.querySelectorAll('details:not([open])')];
+  reopenAfterPrint.forEach((d) => { d.open = true; });
+});
+window.addEventListener('afterprint', () => {
+  reopenAfterPrint.forEach((d) => { d.open = false; });
+  reopenAfterPrint = [];
+});
+
 // ── 起動 ──────────────────────────────
 
 function render() {
@@ -1194,6 +1316,8 @@ function render() {
   drawProtection();
   drawApplications(house);
   drawTables(house);
+  drawAmountEchoes();
+  drawControls(house, config.father.leaveMonths);
 }
 
 document.addEventListener('input', (e) => {
@@ -1235,9 +1359,10 @@ let resizeTimer;
 window.addEventListener('resize', () => {
   document.querySelectorAll('.tip').forEach((t) => { t.hidden = true; });
   clearTimeout(resizeTimer);
-  resizeTimer = setTimeout(render, 150);
+  resizeTimer = setTimeout(() => { render(); setBarHeight(); }, 150);
 });
 
 render();
+watchInputPanel();
 revealHash();
 void childcareBasisYear;
