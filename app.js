@@ -939,7 +939,7 @@ function drawProse(house) {
       `<div class="hero-card">` +
       `<div class="hc-who">${mother.label}（産休中）</div>` +
       `<div class="hc-main"><span class="hc-yen">${fmt(teateAvg)}<span class="hc-unit">円</span></span></div>` +
-      `<div class="hc-sub">出産手当金。お給料のおよそ3分の2で、<b>税金がかからず社会保険料も止まります</b>。</div>` +
+      `<div class="hc-sub">出産手当金。お給料のおよそ3分の2です。</div>` +
       `</div>`
     );
   }
@@ -987,8 +987,7 @@ function drawProse(house) {
       tag: '振り込み',
       head: `育児休業給付の最初の振り込みは ${ym(g.firstPayment.payAbs)}ごろ`,
       body: `${mother.label}が産休に入る ${ym(mother.offStartAbs)} から数えると <b>${fromOff}か月</b>あきます。` +
-        `出産手当金も産後にまとめて申請するのが普通なので、そのあいだお給料も止まっています。` +
-        `ここは貯金でしのぐことになります。`,
+        `そのあいだお給料も止まっているので、ここは貯金でしのぐことになります。`,
       warn: true,
     });
   }
@@ -1046,26 +1045,32 @@ function drawProse(house) {
   ).join('');
 
   // ── 3年ぶんの動きの下の一文 ──
-  let text = '';
-  if (trap) {
-    const names = perOf(trap.m, 'take').filter((x) => x.c.onLeave).map((x) => x.label).join('・');
-    text += `${trap.m.year}年${trap.m.month}月は${names}が休んでいて、その分のお給料も社会保険料も所得税もゼロです。` +
-      `それでも住民税はふたり合わせて ${fmt(trap.m.residentTax)}円 引かれ続けます。前の年の収入にかかる税だからです。`;
-  }
+  //
+  // ここは線の読み方だけを書く。「なぜ住民税だけ引かれ続けるのか」は
+  // 上のカードに一度だけ置いてあるので、ここでは繰り返さない。
+  const bottom = ms.reduce((a, m) => (m.takeNetExBonus < a.takeNetExBonus ? m : a));
+  const parts = [
+    `いちばん低くなるのは ${bottom.year}年${bottom.month}月で、ふたり合わせて ${fmt(bottom.takeNetExBonus)}円です。`,
+  ];
   if (dropIdx > 0 && dropAmt > 1000) {
-    text += ` 下がるのは ${ms[dropIdx].year}年${ms[dropIdx].month}月から。` +
-      `ふたり合わせて月 ${fmt(ms[dropIdx - 1].residentTax)}円 が ${fmt(ms[dropIdx].residentTax)}円 になります。`;
+    parts.push(`${ms[dropIdx].year}年${ms[dropIdx].month}月に一段上がるのは、住民税が下がるためです。`);
   }
-  $('net-callout').textContent = text;
+  const bottomIdx = ms.indexOf(bottom);
+  const back = ms.slice(bottomIdx + 1).find((m) => m.takeNetExBonus >= sn.normalNet);
+  if (back) {
+    parts.push(`ふだんの水準に戻るのは ${back.year}年${back.month}月ごろです。`);
+  }
+  $('net-callout').textContent = parts.join('');
 
   // ── 振り込みの呼びかけ ──
   if (g.firstPayment) {
     const fromOff = g.firstPayment.payAbs - mother.offStartAbs;
     $('pay-callout').innerHTML =
-      `${mother.label}が産休に入るのは ${ym(mother.offStartAbs)}、育休に入るのは ${ym(mother.leaveStartAbs)}。` +
-      `育児休業給付の最初の振り込みは <strong>${ym(g.firstPayment.payAbs)}ごろ</strong>で ${fmt(g.firstPayment.amount)}円です。` +
-      `<strong>産休に入ってから ${fromOff}か月、育休に入ってから ${g.gapMonths}か月あきます。</strong>` +
-      `お給料も止まっているので、この期間ぶんは手元に用意しておくと安心です。`;
+      `${mother.label}は ${ym(mother.offStartAbs)} に産休、${ym(mother.leaveStartAbs)} に育休へ入り、` +
+      `育児休業給付の最初の振り込みは <strong>${ym(g.firstPayment.payAbs)}ごろ</strong>、` +
+      `${fmt(g.firstPayment.amount)}円です（育休に入ってから ${g.gapMonths}か月）。` +
+      `産休に入ってからだと ${fromOff}か月です。` +
+      `<strong>この空白のあいだの生活費</strong>は、手元に用意しておくと安心です。`;
   } else {
     $('pay-callout').textContent = '';
   }
@@ -1085,8 +1090,9 @@ function drawProse(house) {
         : `。産休と育休で下がるので、父が育休を取るかどうかとは関係ありません。`) +
       `</li>`
     ).join('') +
-    `<li><strong>保育料</strong>。ふたりの住民税を足した数字で段階が決まります。下にまとめています。</li>` +
-    `<li><strong>児童手当は収入で変わりません</strong>（2024年10月に所得制限がなくなりました）。</li>`;
+    `<li><strong><a href="#care-h">保育料</a></strong>。ふたりの住民税を足した数字で段階が決まります。</li>` +
+    `<li><strong>児童手当は収入で変わりません</strong>（2024年10月に所得制限がなくなりました）。` +
+    `ほかの制度は<a href="#lim-h">収入で変わるもの、変わらないもの</a>にまとめています。</li>`;
 
   // ── 健康診断・団信の出典 ──
   $('kenshin-source').innerHTML =

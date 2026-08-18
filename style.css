@@ -371,18 +371,19 @@ th[scope="col"] small { font-weight: 400; font-size: .7rem; color: var(--text-mu
 th[scope="row"], tbody td:first-child { text-align: left; }
 tbody tr.on-leave { background: var(--accent-soft); }
 
-/* ── 線引き ───────────────────────── */
+/* ── 線引き（免責の「出していないもの」）────── */
 
-.edge dl { margin: 0; }
-.edge dt {
+.panel.disclaimer dl { margin: 0 0 .75rem; }
+.panel.disclaimer dt {
   font-weight: 600;
   font-size: .875rem;
+  color: var(--text-primary);
   margin-top: .75rem;
 }
-.edge dt:first-child { margin-top: 0; }
-.edge dd {
+.panel.disclaimer dt:first-child { margin-top: 0; }
+.panel.disclaimer dd {
   margin: .15rem 0 0;
-  font-size: .875rem;
+  font-size: .8125rem;
   color: var(--text-secondary);
 }
 
@@ -684,6 +685,14 @@ li.soft { color: var(--text-muted); }
 .disclaimer-top a { color: var(--series-1); }
 
 .panel.disclaimer { border-left: 3px solid var(--series-2); }
+/* 3つのまとまり（当てはまらない場合／出していないもの／差が出ないもの）が
+   ひと目で分かれて見えるように、罫線で区切る。dt との差もこれで付く。 */
+.panel.disclaimer h3 {
+  margin: 1.4rem 0 .5rem;
+  padding-top: .9rem;
+  border-top: 1px solid var(--border);
+  letter-spacing: .02em;
+}
 .panel.disclaimer p { font-size: .875rem; color: var(--text-secondary); margin: 0 0 .6rem; }
 .panel.disclaimer strong { color: var(--text-primary); }
 .panel.disclaimer ul { margin: 0 0 .75rem; padding-left: 1.1rem; }
