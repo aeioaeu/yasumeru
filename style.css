@@ -89,124 +89,83 @@ body {
   -webkit-text-size-adjust: 100%;
 }
 
-main,
-.head,
-.foot { max-width: var(--maxw); margin-inline: auto; }
+body {
+  padding: 0 1rem 1.5rem;
+  line-height: 1.6;
+}
 
-/* ── 見出し ─────────────────────────── */
+/* 1画面に収める。入力とその結果が同時に見えていることが、この道具の芯。
+   縦を使うのは、答えと、その額が何でできているかまで。
+   読む必要はあるが場所を取るものは .about に畳んである。 */
+.page {
+  max-width: 640px;
+  margin-inline: auto;
+  padding-top: .6rem;
+}
 
-.head { padding: 2.5rem 0 1.5rem; }
+/* ── 名前と目的 ───────────────────── */
+
+.brand {
+  margin: 0;
+  font-size: .75rem;
+  font-weight: 700;
+  letter-spacing: .18em;
+  color: var(--text-muted);
+}
 
 h1 {
-  font-size: clamp(1.5rem, 5vw, 2.1rem);
+  font-size: clamp(1.15rem, 4.6vw, 1.5rem);
   line-height: 1.4;
-  margin: 0 0 .75rem;
+  margin: .05rem 0 .2rem;
   letter-spacing: .01em;
 }
 
-h2 {
-  font-size: 1.05rem;
-  margin: 0 0 .75rem;
-  letter-spacing: .02em;
+.lead {
+  margin: 0 0 .55rem;
+  font-size: .8125rem;
+  line-height: 1.55;
+  color: var(--text-secondary);
 }
+.lead strong { color: var(--text-primary); }
 
-h3 {
-  font-size: .95rem;
-  margin: 0 0 .5rem;
-}
+/* ── 入力 ──────────────────────────── */
 
-/* ── パネル ─────────────────────────── */
-
-.panel {
+.inputs {
   background: var(--surface-1);
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  padding: 1.25rem;
-  margin-bottom: 1rem;
+  padding: .7rem .8rem .3rem;
 }
 
-.note {
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: .4rem .8rem;
+}
+
+.f {
+  display: flex;
+  flex-direction: column;
+  gap: .15rem;
+  font-size: .75rem;
   color: var(--text-secondary);
-  font-size: .875rem;
-  margin: .5rem 0 0;
+  min-width: 0;
 }
-.note strong { color: var(--text-primary); }
-
-details { margin-top: .5rem; }
-summary {
-  cursor: pointer;
-  font-size: .875rem;
-  color: var(--text-secondary);
-  padding: .35rem 0;
-}
-summary:focus-visible { outline: 2px solid var(--series-1); outline-offset: 2px; }
-
-/* ── 線引き（免責の「出していないもの」）────── */
-
-.panel.disclaimer dl { margin: 0 0 .75rem; }
-.panel.disclaimer dt {
-  font-weight: 600;
-  font-size: .875rem;
-  color: var(--text-primary);
-  margin-top: .75rem;
-}
-.panel.disclaimer dt:first-child { margin-top: 0; }
-.panel.disclaimer dd {
-  margin: .15rem 0 0;
-  font-size: .8125rem;
-  color: var(--text-secondary);
-}
-
-/* ── 前提・出典 ───────────────────── */
-
-.assume { margin: 0; padding-left: 1.1rem; }
-.assume li { font-size: .875rem; color: var(--text-secondary); margin-bottom: .3rem; }
-
-.sources { margin: 0; padding-left: 1.1rem; }
-.sources li { font-size: .8125rem; color: var(--text-secondary); margin-bottom: .6rem; }
-.sources a { color: var(--link); }
-.sources .org { color: var(--text-muted); }
-.sources .covers { display: block; color: var(--text-muted); font-size: .75rem; }
-
-.foot {
-  padding-top: 1.5rem;
+.f > span { font-weight: 600; color: var(--text-primary); }
+/* 「手取りではなく額面」は、欄の外に注記を足すと1行増える。見出しの中に入れる */
+.f > span small {
+  font-weight: 400;
+  font-size: .72rem;
   color: var(--text-muted);
-  font-size: .8125rem;
+  margin-left: .3rem;
+  white-space: nowrap;   /* 「引かれ／る前」と割れると読めない */
 }
 
-@media (max-width: 480px) {
-  .panel { padding: 1rem; }
-  body { padding-inline: .75rem; }
-}
-
-/* ── 入力（赤ちゃん・父・母） ─────────────── */
-
-.people-inputs {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 1rem;
-  align-items: start;
-}
-
-/* 出産予定日は1つしかないので、横いっぱいに置いて上に立てる */
-.birth {
-  grid-column: 1 / -1;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: .9rem;
-  margin: 0;
-  display: block;
-}
-.birth legend {
-  font-size: .8125rem;
-  font-weight: 700;
-  padding: 0 .4rem;
-  color: var(--text-primary);
-}
-.birth .basic { grid-template-columns: minmax(200px, 320px); }
-.birth input[type="date"] {
+.f input[type="date"],
+.f input[type="number"] {
   width: 100%;
-  padding: .45rem .55rem;
+  min-width: 0;
+  padding: .35rem .5rem;
   font: inherit;
   font-size: .95rem;
   font-variant-numeric: tabular-nums;
@@ -215,261 +174,71 @@ summary:focus-visible { outline: 2px solid var(--series-1); outline-offset: 2px;
   border: 1px solid var(--border-strong);
   border-radius: 6px;
 }
-.birth input:focus-visible { outline: 2px solid var(--series-1); outline-offset: 1px; }
-.birth label {
-  display: flex;
-  flex-direction: column;
-  gap: .25rem;
-  font-size: .8125rem;
-  color: var(--text-secondary);
-}
-.birth label > span { font-weight: 600; color: var(--text-primary); }
-.birth small { color: var(--text-muted); font-size: .72rem; }
 
-/* 母の側は選べるところがないので、その理由を先に書いておく */
-.fixed-note {
-  margin: 0 0 .75rem;
-  padding: .6rem .7rem;
-  font-size: .8125rem;
-  line-height: 1.6;
-  color: var(--text-secondary);
-  background: var(--surface-1);
-  border-radius: 6px;
-}
-
-/* 誰に当てはまらないかを、入力のすぐ下に置く */
-.scope-note {
-  margin: 1rem 0 0;
-  font-size: .8125rem;
-  line-height: 1.7;
-  color: var(--text-secondary);
-}
-
-/* 父の育休の長さ（スライダー） */
-.person label.wide { grid-column: 1 / -1; }
-.person input[type="range"] {
-  width: 100%;
-  accent-color: var(--series-1);
-  margin: .35rem 0 .1rem;
-}
-.person output {
-  font-size: 1.05rem;
-  font-weight: 700;
-  font-variant-numeric: tabular-nums;
-  color: var(--text-primary);
-}
-
-.person {
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: .9rem;
-  margin: 0;
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
-  gap: .75rem .9rem;
-}
-
-.person legend {
-  font-size: .8125rem;
-  font-weight: 700;
-  padding: 0 .4rem;
-  color: var(--text-primary);
-}
-
-.person label {
-  display: flex;
-  flex-direction: column;
-  gap: .25rem;
-  font-size: .8125rem;
-  color: var(--text-secondary);
-}
-.person label > span { font-weight: 600; color: var(--text-primary); }
-.person input[type="number"],
-.person input[type="month"],
-.person input[type="text"] {
-  width: 100%;
-  padding: .45rem .55rem;
-  font: inherit;
-  font-size: .95rem;
-  font-variant-numeric: tabular-nums;
-  color: var(--text-primary);
-  background: var(--surface-0);
-  border: 1px solid var(--border-strong);
-  border-radius: 6px;
-}
-.person input:focus-visible { outline: 2px solid var(--series-1); outline-offset: 1px; }
-.person small { color: var(--text-muted); font-size: .72rem; }
-.person label.check {
-  flex-direction: row;
-  align-items: flex-start;
-  gap: .45rem;
-  grid-column: 1 / -1;
-  font-size: .8125rem;
-  color: var(--text-primary);
-}
-.person label.check input { margin-top: .3rem; flex: none; width: auto; }
-
-/* ── 呼びかけ ───────────────────── */
-
-.callout {
-  margin: .75rem 0 0;
-  padding: .7rem .85rem;
-  border-radius: 8px;
-  background: var(--accent-soft);
-  border-left: 3px solid var(--series-1);
-  font-size: .875rem;
-  color: var(--text-secondary);
-}
-.callout strong { color: var(--text-primary); }
-.callout.warn { border-left-color: var(--series-2); }
-
-/* ── 名前と目的、免責 ───────────────── */
-
-.brand {
-  margin: 0 0 .3rem;
-  font-size: 1.1rem;
-  font-weight: 800;
-  letter-spacing: .22em;
-  color: var(--link);
-}
-
-.purpose {
-  margin: 0 0 .75rem;
-  font-size: .975rem;
-  color: var(--text-primary);
-}
-
-.disclaimer-top {
-  margin: 1rem 0 0;
-  padding: .7rem .85rem;
-  border-radius: 8px;
-  border: 1px solid var(--border-strong);
-  background: var(--surface-1);
-  font-size: .8125rem;
-  color: var(--text-secondary);
-}
-.disclaimer-top strong { color: var(--text-primary); }
-.disclaimer-top a { color: var(--link); }
-
-.panel.disclaimer { border-left: 3px solid var(--series-2); }
-/* 3つのまとまり（当てはまらない場合／出していないもの／差が出ないもの）は
-   畳んである。開く前でも見出しとして読めるように、罫線で区切る。 */
-.panel.disclaimer > details > summary {
-  font-weight: 600;
-  font-size: .9375rem;
-  color: var(--text-primary);
-  padding: .75rem 0;
-  margin-top: .3rem;
-  border-top: 1px solid var(--border);
-}
-.panel.disclaimer p { font-size: .875rem; color: var(--text-secondary); margin: 0 0 .6rem; }
-.panel.disclaimer strong { color: var(--text-primary); }
-.panel.disclaimer ul { margin: 0 0 .75rem; padding-left: 1.1rem; }
-.panel.disclaimer li { font-size: .8125rem; color: var(--text-secondary); margin-bottom: .3rem; }
-.strong-note {
-  padding: .7rem .85rem;
-  border-radius: 8px;
-  background: var(--surface-2);
-}
-
-.foot .future {
-  margin-top: .5rem;
-  padding-top: .5rem;
-  border-top: 1px solid var(--border);
-}
-
-.person select {
-  width: 100%;
-  padding: .45rem .55rem;
-  font: inherit;
-  font-size: .95rem;
-  color: var(--text-primary);
-  background: var(--surface-0);
-  border: 1px solid var(--border-strong);
-  border-radius: 6px;
-}
-.person select:focus-visible { outline: 2px solid var(--series-1); outline-offset: 1px; }
-
-/* バーの内側に入れた値ラベルは面の色で抜く */
-
-/* SVG では CSS の text-anchor が属性より優先されるので、
-   横向きバーの値ラベルはクラスで指定する（.bar-value の middle を上書き） */
-
-/* ══ UXの仕上げ ══════════════════════════
-   よく使われているアプリの見え方に寄せる。
-   モバイルで縦に読み進められること、要点が先に来ること、
-   まとまりがカードで分かれていることの3つを優先している。 */
-
-.section-lead {
-  font-size: 1.05rem;
-  margin: 1.75rem 0 .35rem;
-  letter-spacing: .02em;
-}
-.section-note {
-  margin: 0 0 .75rem;
-  font-size: .875rem;
-  color: var(--text-secondary);
-}
-
-/* 入力は基本だけ見せて、残りは畳む */
-.input-panel .basic {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-  gap: .75rem .9rem;
-}
-.person > .basic { grid-column: 1 / -1; }
-.person { display: block; }
-details.more { margin-top: .75rem; }
-details.more > summary {
-  display: inline-flex;
-  align-items: center;
-  gap: .3rem;
-  font-size: .8125rem;
-  color: var(--link);
-  padding: .5rem 0;
-  min-height: 40px;           /* 指で押せる大きさ */
-}
-details.more > .basic { margin-top: .4rem; }
-
-/* 育休中の毎月の手取り */
-.hero-cards {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: .75rem;
-  margin-bottom: .5rem;
-}
-/* 世帯の合計はこの節の答えなので、1行使って先に読ませる */
-.hero-card.wide { grid-column: 1 / -1; }
-
-.hero-card {
-  background: var(--surface-1);
-  border: 1px solid var(--border);
-  border-left: 3px solid var(--series-1);
-  border-radius: var(--radius);
-  padding: 1rem 1.1rem;
-}
-.hc-who {
+/* 500000 の隣に 50万円。桁を数えないと読めない欄だった */
+.field { display: flex; align-items: center; gap: .35rem; }
+.field > input { flex: 1 1 auto; min-width: 0; }
+.echo {
+  flex: none;
   font-size: .75rem;
   font-weight: 700;
   color: var(--text-secondary);
-  letter-spacing: .06em;
+  font-variant-numeric: tabular-nums;
 }
-.hc-main {
+.echo:empty { display: none; }
+
+/* 動かせるのはここだけなので、幅いっぱいに取って結果のすぐ上に置く */
+.slider {
+  margin-top: .2rem;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: baseline;
+  gap: 0 .5rem;
+}
+.slider > span { grid-column: 1; }
+.slider > output {
+  grid-column: 2;
+  font-size: 1.05rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-primary);
+}
+.slider > input[type="range"] { grid-column: 1 / -1; }
+
+/* ── 結果 ──────────────────────────── */
+
+.result {
+  margin: .5rem 0 .4rem;
+  padding: .7rem .8rem;
+  background: var(--surface-1);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--series-1);
+  border-radius: var(--radius);
+}
+
+.result h2 {
+  margin: 0;
+  font-size: .8125rem;
+  font-weight: 700;
+  letter-spacing: .02em;
+  color: var(--text-secondary);
+}
+
+.big {
   display: flex;
   align-items: baseline;
-  gap: .6rem;
   flex-wrap: wrap;
-  margin: .15rem 0 .35rem;
-}
-.hc-yen {
-  font-size: clamp(1.6rem, 6vw, 2.1rem);
+  gap: 0 .5rem;
+  margin: .05rem 0 .15rem;
+  font-size: clamp(1.9rem, 8vw, 2.5rem);
   font-weight: 700;
   font-variant-numeric: tabular-nums;
   letter-spacing: -.01em;
   line-height: 1.15;
 }
-.hc-unit { font-size: .9rem; font-weight: 600; margin-left: .1rem; }
-.hc-ratio {
+.big .unit { font-size: .95rem; font-weight: 600; margin-left: -.35rem; }
+.big .per { font-size: .8125rem; font-weight: 600; color: var(--text-secondary); }
+.ratio {
   font-size: .8125rem;
   font-weight: 700;
   color: var(--surface-1);
@@ -478,35 +247,125 @@ details.more > .basic { margin-top: .4rem; }
   padding: .15rem .55rem;
   white-space: nowrap;
 }
-.hc-sub { font-size: .8125rem; color: var(--text-secondary); }
-.hc-sub b { color: var(--text-primary); }
 
-/* 先に知っておくと落ち着けること */
-.key-facts {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: .75rem;
-  margin-bottom: 1rem;
+.vs {
+  margin: 0 0 .25rem;
+  font-size: .8125rem;
+  color: var(--text-secondary);
 }
-.fact {
-  background: var(--surface-1);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: .9rem 1rem;
-}
-.fact-head {
-  font-size: .95rem;
-  font-weight: 700;
-  margin: .15rem 0 .3rem;
+.vs b { color: var(--text-primary); }
+
+.parts {
+  margin: 0 0 .3rem;
+  padding: .3rem .45rem;
+  font-size: .72rem;
   line-height: 1.5;
+  color: var(--text-secondary);
+  background: var(--surface-2);
+  border-radius: 6px;
+  font-variant-numeric: tabular-nums;
 }
-.fact-body { font-size: .8125rem; color: var(--text-secondary); }
-.fact-body b { color: var(--text-primary); }
 
-/* 畳めるところは指で押しやすく。
-   display:flex にすると既定の三角が出なくなるので、印は自前で描く。
-   説明を畳んだ分、押せると分かることが前より効く。 */
+.three {
+  margin: 0;
+  font-size: .8125rem;
+  color: var(--text-secondary);
+}
+
+/* ── 線引き ──────────────────────────── */
+
+.limit {
+  margin: 0 0 .2rem;
+  font-size: .75rem;
+  line-height: 1.5;
+  color: var(--text-secondary);
+}
+.limit strong { color: var(--text-primary); }
+
+.about > summary {
+  font-size: .8125rem;
+  color: var(--link);
+}
+.about-body {
+  padding: .5rem 0 0;
+  font-size: .8125rem;
+  color: var(--text-secondary);
+}
+.about-body p { margin: 0 0 .6rem; }
+.about-body strong { color: var(--text-primary); }
+.about-body ul { margin: 0 0 .75rem; padding-left: 1.1rem; }
+.about-body li { margin-bottom: .3rem; }
+.about-body dl { margin: 0 0 .75rem; }
+.about-body dt { font-weight: 600; color: var(--text-primary); margin-top: .6rem; }
+.about-body dd { margin: .1rem 0 0; }
+.about-body details { margin-top: .5rem; }
+
+.callout {
+  margin: .5rem 0;
+  padding: .5rem .6rem;
+  background: var(--accent-soft);
+  border-radius: 6px;
+  font-size: .75rem;
+  line-height: 1.6;
+}
+.callout strong { color: var(--text-primary); }
+
+.assume { margin: 0; padding-left: 1.1rem; }
+.assume li { font-size: .8125rem; margin-bottom: .3rem; }
+
+.sources { margin: 0; padding-left: 1.1rem; }
+.sources li { font-size: .8125rem; margin-bottom: .5rem; }
+.sources a { color: var(--link); }
+.sources .org { color: var(--text-muted); }
+.sources .covers { display: block; color: var(--text-muted); font-size: .72rem; }
+
+.foot {
+  margin: .6rem 0 0;
+  font-size: .72rem;
+  color: var(--text-muted);
+}
+
+/* 畳んだ中の入力（ボーナス・年齢） */
+.more { margin-top: .2rem; }
+.more > summary { font-size: .75rem; color: var(--link); }
+.extras {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: .6rem .9rem;
+  padding-top: .4rem;
+}
+.ex-who {
+  margin: 0 0 .2rem;
+  font-size: .75rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+.ex .f { margin-bottom: .35rem; }
+.ex-note {
+  grid-column: 1 / -1;
+  margin: .2rem 0 0;
+  font-size: .72rem;
+  line-height: 1.55;
+  color: var(--text-muted);
+}
+.check {
+  display: flex;
+  align-items: center;
+  gap: .45rem;
+  min-height: 44px;
+  font-size: .8125rem;
+  color: var(--text-secondary);
+}
+.check input {
+  width: 24px;
+  height: 24px;
+  accent-color: var(--series-1);
+}
+
+/* 畳んである見出しは、この画面で一番よく押される。
+   display:flex にすると既定の三角が出なくなるので、印は自前で描く。 */
 summary {
+  cursor: pointer;
   min-height: 40px;
   display: flex;
   align-items: center;
@@ -525,66 +384,26 @@ summary::before {
   transition: transform .15s ease;
 }
 details[open] > summary::before { transform: rotate(45deg); }
-.panel > details > summary { padding: .5rem 0; }
-
-@media (max-width: 480px) {
-  .head { padding: 1.75rem 0 1rem; }
-  .section-lead { margin-top: 1.25rem; }
-  .hero-card,
-  .fact { padding: .85rem .9rem; }
-}
-
-/* legend の中のチェックボックスが縦に折れて浮いていたので、
-   legend そのものを横並びの箱として扱う */
-.person > legend {
-  float: none;
-}
-
-/* 最初に見えるところの案内 */
-.input-hint {
-  margin: 0 0 .9rem;
-  font-size: .8125rem;
-  color: var(--text-secondary);
-}
-
-/* .person label の flex-direction: column に負けていたので、
-   legend の中のチェックボックスは詳細度を上げて横並びに戻す */
-
-/* 会社側の仕組み・守られていること */
-
-/* ── 読む量を減らす ─────────────
-   結果を先に出して、説明は details に入れる。 */
 
 /* ═══════════════════════════════════════════════════════
-   UX の見直しで入れたもの
-   ─────────────────────────────────────────────────────
-   1. 動かせるものが常に手元にあること（.sticky-bar）
-   2. 入れた数字がそのまま読めること（.echo / .slider-echo）
-   3. 指でも押せること（当たり判定 24px 以上）
-   4. 動きと印刷とキーボードの取りこぼしを塞ぐ
+   見え方の下限（キーボード・読み上げ・指・動き・印刷）
    ═══════════════════════════════════════════════════════ */
 
-:root {
-  --focus: var(--series-1);
-  --bar-h: 0px;   /* .sticky-bar が出ている間だけ JS が上書きする */
-}
+:root { --focus: var(--series-1); }
 
-/* ── キーボード ───────────────────────
-   フォーカスの見え方を1か所に集める。:where() で詳細度を0にしてあるので、
-   個別に書いてある既存の指定はそのまま勝つ。 */
+/* フォーカスの見え方を1か所に集める。:where() で詳細度を0にしてあるので、
+   個別に書いてある指定はそのまま勝つ。 */
 :where(a,
 button,
 summary,
 input,
-select,
 [tabindex]):focus-visible {
   outline: 2px solid var(--focus);
   outline-offset: 2px;
   border-radius: 4px;
 }
 
-/* 本文のリンクは既定の色のままだった。暗い地では地の色に沈むし、
-   明るい地では #0000EE が palette から浮く。1つの色に寄せる。 */
+/* 本文のリンクは既定の色だと、暗い地で沈み、明るい地で palette から浮く */
 a { color: var(--link); }
 a:visited { color: var(--link); }
 
@@ -599,74 +418,13 @@ a:visited { color: var(--link); }
   border: 0;
 }
 
-/* 入力欄を飛ばして結果へ。普段は見えない */
-.skip-link {
-  position: absolute;
-  left: .5rem;
-  top: -4rem;
-  z-index: 60;
-  padding: .6rem .9rem;
-  background: var(--surface-1);
-  color: var(--text-primary);
-  border: 1px solid var(--border-strong);
-  border-radius: 6px;
-  font-size: .875rem;
-  text-decoration: none;
-}
-.skip-link:focus-visible { top: .5rem; }
-
-/* 節へのリンクが見出しの上端ぴったりで止まると、何に飛んだか分からない */
-html {
-  scroll-behavior: smooth;
-  scroll-padding-top: 1rem;
-  scroll-padding-bottom: calc(var(--bar-h) + 1rem);
-}
-
-/* ── 入れた数字をそのまま読めるように ────────
-   500000 は桁を数えないと読めない。普段は「50万円」で考えている。 */
-.field {
-  display: flex;
-  align-items: center;
-  gap: .45rem;
-}
-.field > input { flex: 1 1 auto; min-width: 0; }
-.echo {
-  flex: none;
-  font-size: .8125rem;
-  font-weight: 700;
-  font-variant-numeric: tabular-nums;
-  color: var(--text-secondary);
-  white-space: nowrap;
-}
-.echo:empty { display: none; }
-
-/* ── スライダーのすぐ下に結果を置く ──────────
-   動かした先の数字が画面の外だと、動かす意味が分からない。 */
-.slider-echo {
-  grid-column: 1 / -1;
-  margin: .1rem 0 0;
-  padding: .55rem .7rem;
-  background: var(--accent-soft);
-  border-radius: 8px;
-  font-size: .8125rem;
-  color: var(--text-secondary);
-  line-height: 1.6;
-}
-.slider-echo b {
-  color: var(--text-primary);
-  font-size: 1.0625rem;
-  font-variant-numeric: tabular-nums;
-}
-.slider-echo:empty { display: none; }
-
-/* ── 指で押せる大きさ ─────────────────
-   WCAG 2.2 の 24px と、iOS/Android の 44/48 を見て、当たり判定を広げる。
+/* WCAG 2.2 の 24px と、iOS/Android の 44/48 を見て当たり判定を広げる。
    見た目の大きさは変えず、押せる範囲だけ伸ばす。 */
 input[type="range"] {
   -webkit-appearance: none;
   appearance: none;
   width: 100%;
-  height: 44px;         /* 当たり判定。線は ::-webkit-slider-runnable-track で描く */
+  height: 40px;         /* 当たり判定。線は ::-webkit-slider-runnable-track で描く */
   margin: 0;
   background: transparent;
   cursor: pointer;
@@ -675,12 +433,14 @@ input[type="range"] {
 input[type="range"]::-webkit-slider-runnable-track {
   height: 6px;
   border-radius: 3px;
-  background: var(--border-strong);
+  background: linear-gradient(to right,
+    var(--series-1) var(--fill, 0%), var(--border-strong) var(--fill, 0%));
 }
 input[type="range"]::-moz-range-track {
   height: 6px;
   border-radius: 3px;
-  background: var(--border-strong);
+  background: linear-gradient(to right,
+    var(--series-1) var(--fill, 0%), var(--border-strong) var(--fill, 0%));
 }
 input[type="range"]::-webkit-slider-thumb {
   -webkit-appearance: none;
@@ -700,120 +460,7 @@ input[type="range"]::-moz-range-thumb {
   box-shadow: 0 1px 3px rgb(0 0 0 / .25);
 }
 
-/* チェックボックスは既定だと13px。押せる範囲ごと広げる */
-.person label.check {
-  align-items: center;
-  min-height: 44px;
-}
-.person label.check input {
-  width: 24px;
-  height: 24px;
-  margin-top: 0;
-  accent-color: var(--series-1);
-}
-
-/* 畳んである見出しは、この画面で一番よく押される */
-summary {
-  min-height: 44px;
-  align-items: center;
-}
-
-/* ── 画面の底に残す操作 ────────────────
-   動かせるのは父の育休の月数だけ。それが入力欄まで戻らないと触れないのは、
-   この道具の芯が届いていないのと同じ。
-   出すのは手取りで、差額は出さない（差額を入口にしない方針と揃える）。 */
-.sticky-bar {
-  position: fixed;
-  left: 0; right: 0; bottom: 0;
-  z-index: 50;
-  background: color-mix(in srgb, var(--surface-1) 92%, transparent);
-  backdrop-filter: blur(8px);
-  border-top: 1px solid var(--border-strong);
-  padding: .5rem 1rem calc(.5rem + env(safe-area-inset-bottom));
-}
-.sticky-bar[hidden] { display: none; }
-.sb-inner {
-  max-width: var(--maxw);
-  margin-inline: auto;
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-}
-.sb-slider {
-  flex: 1 1 auto;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 0;
-}
-.sb-cap {
-  font-size: .75rem;
-  color: var(--text-secondary);
-  white-space: nowrap;
-}
-.sb-cap b {
-  color: var(--text-primary);
-  font-variant-numeric: tabular-nums;
-}
-.sb-slider input[type="range"] { height: 36px; }
-.sb-result {
-  flex: none;
-  text-align: right;
-  text-decoration: none;
-  color: inherit;
-  display: block;
-  padding: .2rem 0 .2rem .5rem;
-}
-.sb-label {
-  display: block;
-  font-size: .7rem;
-  color: var(--text-muted);
-}
-.sb-value {
-  display: block;
-  font-size: 1.0625rem;
-  font-weight: 700;
-  font-variant-numeric: tabular-nums;
-  color: var(--text-primary);
-  white-space: nowrap;
-}
-@media (max-width: 380px) {
-  .sb-inner { gap: .6rem; }
-  .sb-value { font-size: .9375rem; }
-}
-
-/* バーの下に本文が隠れないように、その高さだけ足す */
-body { padding-bottom: calc(4rem + var(--bar-h)); }
-
-/* スライダーは「値」と一組で読むもの。縦に離すと目が往復する。
-   ラベル行の右端に値を置いて、線はその下いっぱいに伸ばす。 */
-.person label.wide {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  align-items: baseline;
-  column-gap: .5rem;
-}
-.person label.wide > span { grid-column: 1; grid-row: 1; }
-.person label.wide > output {
-  grid-column: 2; grid-row: 1;
-  text-align: right;
-}
-.person label.wide > input[type="range"],
-.person label.wide > small { grid-column: 1 / -1; }
-
-/* いまどのあたりかを線の色で出す（--fill は JS が入れる） */
-input[type="range"]::-webkit-slider-runnable-track {
-  background: linear-gradient(to right,
-    var(--series-1) var(--fill, 0%), var(--border-strong) var(--fill, 0%));
-}
-input[type="range"]::-moz-range-track {
-  background: linear-gradient(to right,
-    var(--series-1) var(--fill, 0%), var(--border-strong) var(--fill, 0%));
-}
-
-/* ── 動きを止めたい人へ ─────────────── */
 @media (prefers-reduced-motion: reduce) {
-  html { scroll-behavior: auto; }
   *,
   *::before,
   *::after {
@@ -823,13 +470,9 @@ input[type="range"]::-moz-range-track {
   }
 }
 
-/* ── 印刷 ────────────────────────────
-   相手や勤務先と見るために刷ることがある。
+/* 相手や勤務先と見るために刷ることがある。
    畳んである details は JS が印刷前に開く。ここでは邪魔なものを外す。 */
 @media print {
-  .sticky-bar,
-  .skip-link,
-  .input-hint { display: none !important; }
   body {
     padding: 0;
     background: #fff;
@@ -837,36 +480,20 @@ input[type="range"]::-moz-range-track {
     font-size: 10.5pt;
     line-height: 1.5;
   }
-  .panel,
-  .hero-card,
-  .fact {
+  .inputs,
+  .result {
     break-inside: avoid;
     background: #fff;
     border: 1px solid #bbb;
-    box-shadow: none;
   }
-  section { break-inside: avoid; }
-  h2 { break-after: avoid; }
   a { color: #000; text-decoration: underline; }
-  summary { list-style: none; font-weight: 700; color: #000; }
+  summary { font-weight: 700; color: #000; }
 }
 
-/* ── 最初の画面を、道具のぶんだけ空ける ────────
-   目的の一文と免責が箱で並んでいて、入力に着くまでに1画面近く使っていた。
-   免責は消さない（消してよい種類の文ではない）。箱をやめて1行に落とす。 */
-.disclaimer-top {
-  margin: .5rem 0 0;
-  padding: 0;
-  border: 0;
-  background: none;
-  font-size: .8125rem;
-  line-height: 1.6;
-}
-.head { padding-bottom: 1rem; }
-.purpose { margin-bottom: 0; }
-@media (max-width: 480px) {
-  .head { padding: 1.25rem 0 .75rem; }
-  h1 { font-size: clamp(1.35rem, 5.6vw, 1.9rem); line-height: 1.35; }
-  .purpose { font-size: .9375rem; }
-  .input-panel { padding-top: 1rem; }
+/* 狭い画面。1画面に収めるために、余白と文字を一段落とす */
+@media (max-width: 400px) {
+  body { padding-inline: .75rem; }
+  .page { padding-top: .6rem; }
+  .lead { margin-bottom: .6rem; }
+  .grid { gap: .4rem .6rem; }
 }
