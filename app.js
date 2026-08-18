@@ -28,12 +28,16 @@ const dateJa = (d) =>
 
 let careStartOverride = null;
 
+// 画面に出す呼び方。入力欄は持たない（自分で名づけるものではない）。
+// 直書きすると、変えたときにそこだけ古いまま残るので、必ずここから取る。
+const LABELS = { father: 'あなた', mother: 'パートナー' };
+
 function readPerson(role) {
   const node = document.querySelector(`.person[data-role="${role}"]`);
   const q = (cls) => node.querySelector(cls);
   const num = (cls, dflt) => Math.max(0, Number(q(cls).value) || dflt);
   return {
-    label: (q('.p-label').value || '').trim() || (role === 'mother' ? '母' : 'あなた'),
+    label: LABELS[role],
     monthlySalary: num('.p-salary', 0),
     annualBonus: num('.p-bonus', 0),
     bonusMonths: [6, 12],
@@ -661,7 +665,22 @@ function drawDurationChart(host, person) {
   const narrow = W < 560;
   const bs = T.durationBuckets;
   const rowH = narrow ? 22 : 24;
-  const M = { top: 8, right: narrow ? 44 : 56, bottom: 8, left: narrow ? 108 : 132 };
+
+  // 左の幅は区分名の長さしだいなので、実測して決める。決め打ちだと
+  // 「10か月〜12か月未満」が左で切れて「0か月〜12か月未満」に読めてしまう。
+  const probe = el('text', { class: 'axis-text', x: -999, y: -999 });
+  svg.appendChild(probe);
+  let labelW = 0;
+  for (const b of bs) {
+    probe.textContent = b.label;
+    labelW = Math.max(labelW, probe.getComputedTextLength() || 0);
+  }
+  probe.remove();
+
+  const M = {
+    top: 8, right: narrow ? 44 : 56, bottom: 8,
+    left: Math.min(Math.ceil(labelW) + 12, Math.round(W * 0.5)),
+  };
   const H = M.top + M.bottom + rowH * bs.length;
   svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
   const pw = W - M.left - M.right;
@@ -906,6 +925,13 @@ function drawTables(house) {
 function drawLabels() {
   const mother = PEOPLE.find((p) => p.role === 'mother');
   const father = PEOPLE.find((p) => p.role === 'father');
+
+  document.querySelectorAll('.person').forEach((fs) => {
+    fs.querySelector('legend .who').textContent = LABELS[fs.dataset.role];
+  });
+  // 静的な文の中で人を指すところは、この2つのクラスで差し替える
+  document.querySelectorAll('.p-mother').forEach((e) => { e.textContent = mother.label; });
+  document.querySelectorAll('.p-father').forEach((e) => { e.textContent = father.label; });
 
   $('snap-note').innerHTML =
     `${mother.label}は出産手当金、${father.label}は育児休業給付。` +

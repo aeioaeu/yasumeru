@@ -44,13 +44,8 @@
       </fieldset>
 
       <fieldset class="person" data-role="father">
-        <legend>産休を取らないほう</legend>
+        <legend><span class="who"></span>（産休を取らないほう）</legend>
         <div class="basic">
-          <label>
-            <span>呼び方</span>
-            <input type="text" class="p-label" value="あなた" maxlength="6">
-            <small>下の結果ぜんぶに使います。お名前でもかまいません</small>
-          </label>
           <label>
             <span>月のお給料</span>
             <input type="number" class="p-salary" value="500000" min="0" step="10000" inputmode="numeric">
@@ -85,16 +80,11 @@
       </fieldset>
 
       <fieldset class="person" data-role="mother">
-        <legend>産休を取るほう</legend>
+        <legend><span class="who"></span>（産休を取るほう）</legend>
         <p class="fixed-note">
           <strong>産後8週間は就業させてはならない</strong>ので（労基法65条）、ここは固定です。
         </p>
         <div class="basic">
-          <label>
-            <span>呼び方</span>
-            <input type="text" class="p-label" value="母" maxlength="6">
-            <small>下の結果ぜんぶに使います</small>
-          </label>
           <label>
             <span>月のお給料</span>
             <input type="number" class="p-salary" value="400000" min="0" step="10000" inputmode="numeric">
@@ -124,7 +114,7 @@
     </div>
 
     <p class="scope-note">
-      計算できるのは、<strong>ふたりとも雇用保険に入っていて、母が産休から続けて育休を取る</strong>形だけです。
+      計算できるのは、<strong>ふたりとも雇用保険に入っていて、<span class="p-mother"></span>が産休から続けて育休を取る</strong>形だけです。
       <a href="#scope">当てはまらない場合</a>
     </p>
 
@@ -157,7 +147,7 @@
   <!-- ── 手取りの推移 ───────────────────────── -->
   <section class="panel" aria-labelledby="net-h">
     <h2 id="net-h">3年ぶんの動き</h2>
-    <p class="note">産休に入ってから、母の復帰の2年後まで。ふたり合わせた手取りです。</p>
+    <p class="note">産休に入ってから、<span class="p-mother"></span>の復帰の2年後まで。ふたり合わせた手取りです。</p>
 
     <div class="legend" role="list" id="net-legend"></div>
 
@@ -191,7 +181,7 @@
       <summary>どうして間があくのか</summary>
       <p class="note">
         給付金そのものは毎月もらえますが、申請が2か月ごとなので、振り込みはそのあとになります。
-        母は産休のぶんも産後にまとめて申請するのが普通なので、<strong>ここがいちばん長くあきます。</strong>
+        <span class="p-mother"></span>は産休のぶんも産後にまとめて申請するのが普通なので、<strong>ここがいちばん長くあきます。</strong>
         申請が通ってから振り込みまでは1週間ほどです。
       </p>
     </details>
@@ -491,11 +481,11 @@
     <details id="scope">
       <summary>当てはまらない場合</summary>
     <p>
-      計算できるのは、<strong>ふたりとも雇用保険に入っていて、母が産休から続けて育休を取る</strong>形だけです。
+      計算できるのは、<strong>ふたりとも雇用保険に入っていて、<span class="p-mother"></span>が産休から続けて育休を取る</strong>形だけです。
       次の場合、ここでの計算は当てはまりません。
     </p>
     <ul>
-      <li>母が育休を取らない・取れない場合（母が主に稼いでいる、職場の事情など）。</li>
+      <li><span class="p-mother"></span>が育休を取らない・取れない場合（主に稼いでいる、職場の事情など）。</li>
       <li>ひとり親の場合。</li>
       <li>自営業やフリーランスなど、雇用保険に入っていない場合。</li>
       <li>雇用保険に入っていた期間が足りない場合（休業に入る前の2年で、賃金の支払いのもとになる日が11日以上ある月が12か月必要です）。</li>
