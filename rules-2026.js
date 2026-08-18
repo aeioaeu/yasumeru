@@ -427,7 +427,7 @@ export const RULES = {
     joseikin: {
       name: '両立支援等助成金',
       org: '厚生労働省',
-      url: 'https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/koyou_roudou/koyoukintou/kyufukin/index.html',
+      url: 'https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/kodomo/shokuba_kosodate/ryouritsu01/index.html',
       note: '会社が受け取れる助成金。本人が申請するものではない。令和8年度に対象と金額が広がっている',
       courses: [
         {
@@ -594,7 +594,7 @@ export const SOURCES = [
   {
     label: '両立支援等助成金',
     org: '厚生労働省',
-    url: 'https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/koyou_roudou/koyoukintou/kyufukin/index.html',
+    url: 'https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/kodomo/shokuba_kosodate/ryouritsu01/index.html',
     covers: '会社が受け取れる助成金のコースと、令和8年度の拡充',
   },
   {
