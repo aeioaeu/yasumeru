@@ -926,9 +926,6 @@ function drawLabels() {
   const mother = PEOPLE.find((p) => p.role === 'mother');
   const father = PEOPLE.find((p) => p.role === 'father');
 
-  document.querySelectorAll('.person').forEach((fs) => {
-    fs.querySelector('legend .who').textContent = LABELS[fs.dataset.role];
-  });
   // 静的な文の中で人を指すところは、この2つのクラスで差し替える
   document.querySelectorAll('.p-mother').forEach((e) => { e.textContent = mother.label; });
   document.querySelectorAll('.p-father').forEach((e) => { e.textContent = father.label; });
