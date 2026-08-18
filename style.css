@@ -685,13 +685,15 @@ li.soft { color: var(--text-muted); }
 .disclaimer-top a { color: var(--series-1); }
 
 .panel.disclaimer { border-left: 3px solid var(--series-2); }
-/* 3つのまとまり（当てはまらない場合／出していないもの／差が出ないもの）が
-   ひと目で分かれて見えるように、罫線で区切る。dt との差もこれで付く。 */
-.panel.disclaimer h3 {
-  margin: 1.4rem 0 .5rem;
-  padding-top: .9rem;
+/* 3つのまとまり（当てはまらない場合／出していないもの／差が出ないもの）は
+   畳んである。開く前でも見出しとして読めるように、罫線で区切る。 */
+.panel.disclaimer > details > summary {
+  font-weight: 600;
+  font-size: .9375rem;
+  color: var(--text-primary);
+  padding: .75rem 0;
+  margin-top: .3rem;
   border-top: 1px solid var(--border);
-  letter-spacing: .02em;
 }
 .panel.disclaimer p { font-size: .875rem; color: var(--text-secondary); margin: 0 0 .6rem; }
 .panel.disclaimer strong { color: var(--text-primary); }
@@ -806,7 +808,6 @@ details.more > summary {
   padding: .5rem 0;
   min-height: 40px;           /* 指で押せる大きさ */
 }
-details.more > summary::marker { color: var(--text-muted); }
 details.more > .basic { margin-top: .4rem; }
 .care-more { border-top: 1px solid var(--border); margin-top: 1rem; }
 
@@ -897,8 +898,28 @@ details.more > .basic { margin-top: .4rem; }
 .fact-body { font-size: .8125rem; color: var(--text-secondary); }
 .fact-body b { color: var(--text-primary); }
 
-/* 畳めるところは指で押しやすく */
-summary { min-height: 40px; display: flex; align-items: center; }
+/* 畳めるところは指で押しやすく。
+   display:flex にすると既定の三角が出なくなるので、印は自前で描く。
+   説明を畳んだぶん、押せると分かることが前より効く。 */
+summary {
+  min-height: 40px;
+  display: flex;
+  align-items: center;
+  gap: .45rem;
+  list-style: none;
+}
+summary::-webkit-details-marker { display: none; }
+summary::before {
+  content: '';
+  flex: none;
+  width: .4rem;
+  height: .4rem;
+  border-right: 1.5px solid currentColor;
+  border-bottom: 1.5px solid currentColor;
+  transform: rotate(-45deg);
+  transition: transform .15s ease;
+}
+details[open] > summary::before { transform: rotate(45deg); }
 .panel > details > summary { padding: .5rem 0; }
 
 @media (max-width: 480px) {
@@ -970,3 +991,70 @@ ul.apps li .amt {
 }
 .panel.protect { border-left: 3px solid var(--series-3); }
 .panel.protect ul.apps li { border-bottom-color: var(--border); }
+
+
+/* ── 読む量を減らすための3つ ─────────────
+   結果を先に出して、説明は details に入れる。
+   読まなくても困らないものは .fine に落とす。 */
+
+/* 小さい注記。目に入るが、読み飛ばしてよいもの */
+.fine {
+  font-size: .75rem;
+  color: var(--text-muted);
+  margin: .6rem 0 0;
+  line-height: 1.65;
+}
+.fine strong { color: var(--text-secondary); }
+
+/* 「どうしてそうなるか」。数字を見てから読みたい人だけが開く */
+details.why { margin-top: .85rem; }
+details.why > summary {
+  color: var(--series-1);
+  font-size: .8125rem;
+}
+details.why > .note:first-of-type { margin-top: .45rem; }
+
+/* 入力で数字が動く節と、制度の話の節の境目 */
+.part-break {
+  margin: 2.5rem 0 1rem;
+  padding-top: 1.4rem;
+  border-top: 1px solid var(--border);
+  text-align: center;
+}
+.part-break h2 {
+  font-size: .9375rem;
+  color: var(--text-secondary);
+  margin: 0 0 .3rem;
+}
+.part-break p {
+  font-size: .8125rem;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+/* 「収入で変わるもの」の表だけは、説明が長くて390pxに収まらない。
+   狭い画面では行を縦に積んで、横スクロールを作らない。 */
+@media (max-width: 560px) {
+  #limit-table, #limit-table tbody, #limit-table tr, #limit-table td { display: block; }
+  #limit-table { min-width: 0; width: 100%; }
+  #limit-table thead { display: none; }
+  #limit-table tr {
+    padding: .7rem 0;
+    border-bottom: 1px solid var(--border);
+  }
+  #limit-table tr:last-child { border-bottom: 0; }
+  #limit-table td {
+    border: 0;
+    padding: 0;
+    /* 3列前提の指定（右寄せ・折り返し禁止・最小幅）を縦積み用に戻す */
+    width: auto;
+    min-width: 0;
+    text-align: left;
+    white-space: normal;
+  }
+  #limit-table td:first-child {
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+  #limit-table td:nth-child(2) { font-size: .8125rem; margin: .1rem 0 .2rem; }
+}

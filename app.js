@@ -971,10 +971,9 @@ function drawProse(house) {
     facts.push({
       tag: 'ふたり分',
       head: `${father.label}が取ると、${mother.label}の給付も増えます`,
-      body: `出生後休業支援給付金（13%の上乗せ）は、<b>ふたりとも14日以上取ることが条件</b>です。` +
-        `${father.label}が取らないと ${mother.label}のぶんも出ません。` +
-        `ふたり合わせて <b>${fmt(mGain + fGain)}円</b>（${mother.label} ${fmt(mGain)}円 ／ ${father.label} ${fmt(fGain)}円）が、` +
-        `${father.label}が取るかどうかで決まります。`,
+      body: `13%の上乗せは<b>ふたりとも14日以上取ることが条件</b>なので、${father.label}が取らないと` +
+        `${mother.label}のぶんも出ません。ふたり合わせて <b>${fmt(mGain + fGain)}円</b>` +
+        `（${mother.label} ${fmt(mGain)}円 ／ ${father.label} ${fmt(fGain)}円）。`,
       good: true,
     });
   }
@@ -1006,9 +1005,8 @@ function drawProse(house) {
     facts.push({
       tag: '住民税',
       head: '休んでいるあいだも住民税は払い続けます',
-      body: `${trap.m.year}年${trap.m.month}月の${trap.who.label}は、お給料も社会保険料も所得税もゼロですが、` +
-        `住民税だけは <b>${fmt(trap.who.c.residentTax)}円</b> 引かれます。` +
-        `前の年の収入にかかる税なので、いま働いていなくても止まりません。`,
+      body: `${trap.m.year}年${trap.m.month}月の${trap.who.label}は、お給料も社会保険料もゼロですが、` +
+        `住民税だけは <b>${fmt(trap.who.c.residentTax)}円</b> 引かれます。前の年の収入にかかる税だからです。`,
     });
   }
 
@@ -1022,7 +1020,7 @@ function drawProse(house) {
       tag: '住民税',
       head: `${ms[dropIdx].year}年${ms[dropIdx].month}月から住民税が下がります`,
       body: `月 ${fmt(ms[dropIdx - 1].residentTax)}円 が <b>${fmt(ms[dropIdx].residentTax)}円</b> に。` +
-        `収入が下がったぶんが、1年おくれてここで返ってきます。`,
+        `収入が下がったぶんが、1年おくれて返ってきます。`,
       good: true,
     });
   }
@@ -1033,8 +1031,7 @@ function drawProse(house) {
     head: `${father.label}が${sn.fatherLeaveMonths}か月取ると、ふたり合わせて ` +
       `${d < 0 ? man(Math.abs(d)) + ' 少なくなります' : man(d) + ' 多くなります'}`,
     body: `${ym(house.timeline.startAbs)}から${house.summary.monthsShown}か月ぶんの合計です。` +
-      `取ると ${fmt(house.summary.takeTotal)}円、取らないと ${fmt(house.summary.skipTotal)}円。` +
-      `${mother.label}の産休と育休はどちらにも同じだけ入っているので、この差は${father.label}のぶんだけです。`,
+      `取ると ${fmt(house.summary.takeTotal)}円、取らないと ${fmt(house.summary.skipTotal)}円。`,
   });
 
   $('key-facts').innerHTML = facts.map((f) =>
@@ -1169,6 +1166,20 @@ $('care-reset').addEventListener('click', () => {
   render();
 });
 
+// 説明は details に畳んである。リンクの飛び先がその中にあるときは開く。
+function revealHash() {
+  const id = decodeURIComponent(location.hash.slice(1));
+  if (!id) return;
+  const target = document.getElementById(id);
+  if (!target) return;
+  for (let el = target; el; el = el.parentElement) {
+    if (el.tagName === 'DETAILS') el.open = true;
+  }
+  if (target.tagName === 'DETAILS') target.open = true;
+  target.scrollIntoView({ block: 'start' });
+}
+window.addEventListener('hashchange', revealHash);
+
 let resizeTimer;
 window.addEventListener('resize', () => {
   document.querySelectorAll('.tip').forEach((t) => { t.hidden = true; });
@@ -1177,4 +1188,5 @@ window.addEventListener('resize', () => {
 });
 
 render();
+revealHash();
 void childcareBasisYear;
