@@ -408,12 +408,84 @@ tbody tr.on-leave { background: var(--accent-soft); }
   body { padding-inline: .75rem; }
 }
 
-/* ── 2人ぶんの入力 ─────────────────── */
+/* ── 入力（赤ちゃん・父・母） ─────────────── */
 
 .people-inputs {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   gap: 1rem;
+  align-items: start;
+}
+
+/* 出産予定日は1つしかないので、横いっぱいに置いて上に立てる */
+.birth {
+  grid-column: 1 / -1;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: .9rem;
+  margin: 0;
+  display: block;
+}
+.birth legend {
+  font-size: .8125rem;
+  font-weight: 700;
+  padding: 0 .4rem;
+  color: var(--text-primary);
+}
+.birth .basic { grid-template-columns: minmax(200px, 320px); }
+.birth input[type="date"] {
+  width: 100%;
+  padding: .45rem .55rem;
+  font: inherit;
+  font-size: .95rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-primary);
+  background: var(--surface-0);
+  border: 1px solid var(--border-strong);
+  border-radius: 6px;
+}
+.birth input:focus-visible { outline: 2px solid var(--series-1); outline-offset: 1px; }
+.birth label {
+  display: flex;
+  flex-direction: column;
+  gap: .25rem;
+  font-size: .8125rem;
+  color: var(--text-secondary);
+}
+.birth label > span { font-weight: 600; color: var(--text-primary); }
+.birth small { color: var(--text-muted); font-size: .72rem; }
+
+/* 母の側は選べるところがないので、その理由を先に書いておく */
+.fixed-note {
+  margin: 0 0 .75rem;
+  padding: .6rem .7rem;
+  font-size: .8125rem;
+  line-height: 1.6;
+  color: var(--text-secondary);
+  background: var(--surface-1);
+  border-radius: 6px;
+}
+
+/* 誰に当てはまらないかを、入力のすぐ下に置く */
+.scope-note {
+  margin: 1rem 0 0;
+  font-size: .8125rem;
+  line-height: 1.7;
+  color: var(--text-secondary);
+}
+
+/* 父の育休の長さ（スライダー） */
+.person label.wide { grid-column: 1 / -1; }
+.person input[type="range"] {
+  width: 100%;
+  accent-color: var(--series-1);
+  margin: .35rem 0 .1rem;
+}
+.person output {
+  font-size: 1.05rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-primary);
 }
 
 .person {
@@ -736,6 +808,9 @@ details.more > .basic { margin-top: .4rem; }
   gap: .75rem;
   margin-bottom: .5rem;
 }
+/* 世帯の合計はこの節の答えなので、1行使って先に読ませる */
+.hero-card.wide { grid-column: 1 / -1; }
+
 .hero-card {
   background: var(--surface-1);
   border: 1px solid var(--border);
