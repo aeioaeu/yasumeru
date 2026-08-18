@@ -17,7 +17,7 @@
 
   --series-1: #2a78d6;    /* 育休を取る */
   --series-2: #eb6834;    /* 取らない */
-  --series-3: #1baf7a;    /* 人ごとの色（ふたり目） */
+  --series-3: #1baf7a;    /* 人ごとの色（二人目） */
 
   --grid: #e4e4e0;
   --accent-soft: rgba(42, 120, 214, 0.10);
@@ -900,7 +900,7 @@ details.more > .basic { margin-top: .4rem; }
 
 /* 畳めるところは指で押しやすく。
    display:flex にすると既定の三角が出なくなるので、印は自前で描く。
-   説明を畳んだぶん、押せると分かることが前より効く。 */
+   説明を畳んだ分、押せると分かることが前より効く。 */
 summary {
   min-height: 40px;
   display: flex;
@@ -980,7 +980,7 @@ details[open] > summary::before { transform: rotate(45deg); }
   color: var(--text-primary);
 }
 
-/* 会社側のしくみ・守られていること */
+/* 会社側の仕組み・守られていること */
 ul.apps li .amt {
   display: inline-block;
   margin-left: .5rem;
