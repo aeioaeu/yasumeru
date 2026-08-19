@@ -193,17 +193,16 @@ h1 {
   border-radius: 6px;
 }
 
-/* 500000 の隣に 50万円。桁を数えないと読めない欄だった */
-.field { display: flex; align-items: center; gap: .35rem; }
-.field > input { flex: 1 1 auto; min-width: 0; }
-.echo {
+/* 万円単位で入れてもらう。500000 は桁を数えないと読めなかった */
+.field { display: flex; align-items: baseline; gap: .35rem; }
+/* 2桁しか入らない欄を横いっぱいに広げない。単位を数字のすぐ隣に置く */
+.field > input { flex: 0 1 5.5rem; min-width: 0; }
+.unit {
   flex: none;
-  font-size: .75rem;
-  font-weight: 700;
+  font-size: .8125rem;
+  font-weight: 600;
   color: var(--text-secondary);
-  font-variant-numeric: tabular-nums;
 }
-.echo:empty { display: none; }
 
 /* 動かせるのはここだけなので、幅いっぱいに取って結果のすぐ上に置く */
 .slider {

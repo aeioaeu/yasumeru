@@ -26,7 +26,9 @@ function readPerson(role) {
   const num = (cls, dflt) => Math.max(0, Number(q(cls)?.value) || dflt);
   return {
     label: LABELS[role],
-    monthlySalary: num('.p-salary', 0),
+    // 入力は万円単位。500000 を桁を数えて読ませるより、50 と書けるほうが速いし、
+    // 社会保険料は等級表・住民税は自治体で変わるので、一円単位の精度はそもそも出せない。
+    monthlySalary: num('.p-salary', 0) * 10000,
     annualBonus: 0,
     bonusMonths: [6, 12],
     isOver40: !!q('.p-over40')?.checked,
@@ -118,16 +120,6 @@ function drawResult(house, months) {
     `育休を取らない場合は ${fmt(withoutFather)}円です。`;
 }
 
-// 500000 は桁を数えないと読めない。普段は「50万円」で考えている。
-function drawEchoes() {
-  document.querySelectorAll('.p-salary').forEach((input) => {
-    const echo = input.parentElement.querySelector('.echo');
-    if (!echo) return;
-    const v = Number(input.value);
-    echo.textContent = v > 0 ? man(v) : '';
-  });
-}
-
 // スライダーの線を、いまの値まで色で埋める
 function drawSlider(months) {
   $('father-months').style.setProperty('--fill', `${((months - 1) / 11) * 100}%`);
@@ -169,7 +161,6 @@ function render() {
   const config = readConfig();
   const house = simulateHousehold(RULES, config);
   drawResult(house, config.father.leaveMonths);
-  drawEchoes();
   drawSlider(config.father.leaveMonths);
 }
 
