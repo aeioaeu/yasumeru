@@ -124,17 +124,22 @@ function drawResult(house, months) {
     (house.shusseigo.take.father > 0 ? '<span class="term">（最初の28日は+13%）</span>' : '') +
     ` ${term('＋ お給料', s)} ${term('− 税・社会保険料', c)}`;
 
-  // 比べる相手を2つ並べる。どちらも「いまの額」を主語にして書く。
-  // 差だけ・割合だけを出すと、何を基準にした数字なのかが読み取れない。
+  // 比べる相手を2つ並べる。差だけ・割合だけを出すと、
+  // 何を基準にした数字なのかが読み取れない。
+  //
+  // 注記の主語は、行ごとに自然なほうを使う。以前は両方「いま」で揃えていたが、
+  // 期間の話をしている画面で「いま」は時間の今に読める。
+  // 上の行は期間の比較（育休中 vs ふだん）、下の行は選択の比較（取る vs 取らない）。
   //
   // 差は「出ている数字どうしの引き算」で出す。丸める前の額から出すと、
   // 画面の 61.6 − 61.2 と注記の 0.5万円 が食い違うことがある。
   const skipShown = man10(withoutFather);
   const gap = Math.round((shown - skipShown) * 10) / 10;
   const rows = [
-    ['ふだんの月', man10(sn.normalNet), ratio != null ? `いまはその ${ratio}%` : '', 'down'],
+    ['ふだんの月', man10(sn.normalNet), ratio != null ? `育休中はその ${ratio}%` : '', 'down'],
     ['取らない場合', skipShown,
-      gap >= 0 ? `いまのほうが ${manNum(gap)}万円 多い` : `いまのほうが ${manNum(-gap)}万円 少ない`,
+      gap >= 0 ? `取ったほうが ${manNum(gap)}万円 多い`
+               : `取らないほうが ${manNum(-gap)}万円 多い`,
       gap > 0 ? 'up' : 'down'],
   ];
   // 額と注記は別の列にする。同じセルに入れると、注記の長さで額の右端が動いて
