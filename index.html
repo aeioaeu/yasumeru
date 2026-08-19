@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>やすめる — 父が育休を取ると、お金はどうなるか</title>
-<meta name="description" content="父が育休を取ると世帯のお金はどう動くのか。母は産休から育休まで制度の上限まで取る前提で固定し、父の月数だけを動かして、前後3年分をまとめて見られます。">
+<title>やすめる — パパが育休を取ると、お金はどうなるか</title>
+<meta name="description" content="赤ちゃんのパパが育休を取ると世帯のお金はどう動くのか。ママは産休から育休まで制度の上限まで取る前提で固定し、パパの月数だけを動かして、二人とも家にいる間の手取りを出します。">
 <link rel="stylesheet" href="style.css">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22%3E%3Crect width=%2232%22 height=%2232%22 rx=%228%22 fill=%22%232a78d6%22/%3E%3Cpath d=%22M8 20h4v4H8zM14 14h4v10h-4zM20 8h4v16h-4z%22 fill=%22%23fff%22/%3E%3C/svg%3E">
 <meta name="theme-color" content="#f4f4f2" media="(prefers-color-scheme: light)">
@@ -12,658 +12,198 @@
 </head>
 <body>
 
-<a class="skip-link" href="#snap-h">結果まで飛ぶ</a>
+<!-- 1画面に収める。入力とその結果が同時に見えていないと、スライダーを動かしても何が変わったのか分からない。読む必要があるが場所を取るもの（できないこと・前提・出典）は、消さずに1つの details に畳んである。 -->
+<main class="page">
 
-<header class="head">
-  <p class="brand">やすめる</p>
-  <h1>父が育休を取ると、お金はどうなるか</h1>
-  <p class="purpose">
-    <strong>母は制度の上限まで取るものとして固定し、父の月数だけを動かします。</strong>
-    前後3年分の世帯の手取りを、まとめて見られます。
-  </p>
-  <p class="disclaimer-top">
-    出るのは<strong>目安</strong>です。大きな計画の根拠にするには向きません。
-    <a href="#disclaimer">できること・できないこと</a>
-  </p>
-</header>
-
-<main>
+  <header class="head">
+    <p class="brand">やすめる</p>
+    <h1>パパが育休を取ると、お金はどうなるか</h1>
+    <p class="lead">
+      <span class="p-mother"></span>の休みは固定（産後8週は法律で休む決まり）。<span class="nb">動かすのは<strong><span class="p-father"></span>の月数だけ</strong>。</span>
+    </p>
+  </header>
 
   <!-- ── 入力 ────────────────────────────── -->
-  <section class="panel input-panel" aria-labelledby="input-h">
-    <h2 id="input-h">当てはまるものを入れてみてください</h2>
-    <p class="input-hint">
-      例の数字が入っています。変えると、下の結果がその場で動きます。
-    </p>
+  <section class="inputs" aria-label="条件を入れる">
+    <!-- 見出しは置かない。欄のラベルが「パパの月給」なので、その上に「赤ちゃんのパパとママ」と書いても何も足さない。ここで要るのは「入っている数字は自分のものではない」という合図だけ。 -->
+    <p class="in-h">この数字は例です。<strong>入れ替えてください。</strong></p>
+    <!-- 月給2つは必ず同じ行に入れる。3つを auto-fit で並べると、幅によっては「日付・パパ」「ママ」の2行になって、二人の欄が斜めに並んでしまう。 -->
+    <div class="grid">
+      <label class="f date">
+        <span>出産予定日</span>
+        <input type="date" id="birth-date" value="2026-10-15">
+      </label>
 
-    <div class="people-inputs">
-      <fieldset class="birth">
-        <legend>赤ちゃん</legend>
-        <div class="basic">
-          <label>
-            <span>出産予定日</span>
-            <input type="date" id="birth-date" value="2026-10-15">
-            <small>この日に生まれるものとして計算します</small>
-          </label>
-        </div>
-      </fieldset>
-
-      <fieldset class="person" data-role="father">
-        <legend>赤ちゃんのお父さま</legend>
-        <div class="basic">
-          <label>
-            <span>月のお給料</span>
-            <span class="field"><input type="number" class="p-salary" value="500000" min="0" step="10000" inputmode="numeric"><b class="echo" aria-hidden="true"></b></span>
-            <small>手取りではなく、引かれる前の額</small>
-          </label>
-          <label>
-            <span>ボーナス（1年分）</span>
-            <span class="field"><input type="number" class="p-bonus" value="1500000" min="0" step="100000" inputmode="numeric"><b class="echo" aria-hidden="true"></b></span>
-            <small>6月と12月に半分ずつとして計算します</small>
-          </label>
-          <label class="wide">
-            <span>育休の長さ</span>
-            <input type="range" id="father-months" class="p-months" value="1" min="1" max="12" step="1">
-            <output id="father-months-out">1か月</output>
-            <small>赤ちゃんが生まれた日から。産後の回復期を支えるなら1か月は要ります</small>
-          </label>
-          <p class="slider-echo wide" id="slider-echo"></p>
-        </div>
-        <details class="more">
-          <summary>当てはまれば</summary>
-          <div class="basic">
-            <label>
-              <span>育休中のボーナス</span>
-              <input type="number" class="p-bonus-rate" value="0" min="0" max="100" step="10" inputmode="numeric">
-              <small>いつもの何% （出ないなら0）</small>
-            </label>
-            <label class="check">
-              <input type="checkbox" class="p-over40">
-              <span>40歳以上（介護保険料がかかります）</span>
-            </label>
-          </div>
-        </details>
-      </fieldset>
-
-      <fieldset class="person" data-role="mother">
-        <legend>赤ちゃんのお母さま</legend>
-        <p class="fixed-note">
-          <strong>産後8週間は就業させてはならない</strong>ので（労基法65条）、ここは固定です。
-        </p>
-        <div class="basic">
-          <label>
-            <span>月のお給料</span>
-            <span class="field"><input type="number" class="p-salary" value="400000" min="0" step="10000" inputmode="numeric"><b class="echo" aria-hidden="true"></b></span>
-            <small>手取りではなく、引かれる前の額</small>
-          </label>
-          <label>
-            <span>ボーナス（1年分）</span>
-            <span class="field"><input type="number" class="p-bonus" value="1200000" min="0" step="100000" inputmode="numeric"><b class="echo" aria-hidden="true"></b></span>
-            <small>6月と12月に半分ずつとして計算します</small>
-          </label>
-        </div>
-        <details class="more">
-          <summary>当てはまれば</summary>
-          <div class="basic">
-            <label>
-              <span>育休中のボーナス</span>
-              <input type="number" class="p-bonus-rate" value="0" min="0" max="100" step="10" inputmode="numeric">
-              <small>いつもの何% （出ないなら0）</small>
-            </label>
-            <label class="check">
-              <input type="checkbox" class="p-over40">
-              <span>40歳以上（介護保険料がかかります）</span>
-            </label>
-          </div>
-        </details>
-      </fieldset>
-    </div>
-
-    <p class="scope-note">
-      計算できるのは、<strong>二人とも雇用保険に入っていて、<span class="p-mother"></span>が産休から続けて育休を取る</strong>形だけです。
-      <a href="#scope">当てはまらない場合</a>
-    </p>
-
-    <details class="more care-more">
-      <summary>保育園に入れる時期を変える</summary>
-      <div class="care-start">
-        <label>
-          <span>保育を始める月</span>
-          <input type="month" id="care-start">
-          <small id="care-start-note"></small>
+      <div class="pair">
+        <label class="f" data-role="father">
+          <span><span class="p-father"></span>の月給<small>引かれる前</small></span><span class="field"><input type="number" class="p-salary" value="50" min="0" max="300" step="1" inputmode="numeric"><b class="unit">万円</b></span>
         </label>
-        <button type="button" id="care-reset" class="ghost">元に戻す</button>
+
+        <label class="f" data-role="mother">
+          <span><span class="p-mother"></span>の月給<small>引かれる前</small></span><span class="field"><input type="number" class="p-salary" value="40" min="0" max="300" step="1" inputmode="numeric"><b class="unit">万円</b></span>
+        </label>
       </div>
-    </details>
-  </section>
-
-  <!-- ── 毎月の手取り（一番先に知りたいこと） ─── -->
-  <section aria-labelledby="snap-h">
-    <!-- 入力で数字が入れ替わるので、読み上げにも一度だけ結果を渡す -->
-    <p class="sr-only" id="live-status" role="status" aria-live="polite"></p>
-    <h2 id="snap-h" class="section-lead">二人とも家にいる間、世帯の手取りはこのくらいです</h2>
-    <p class="section-note" id="snap-note"></p>
-    <div id="hero-cards" class="hero-cards"></div>
-  </section>
-
-  <!-- ── 要点 ────────────────────────────── -->
-  <section aria-labelledby="key-h">
-    <h2 id="key-h" class="section-lead">先に知っておくと落ち着けること</h2>
-    <div id="key-facts" class="key-facts"></div>
-  </section>
-
-  <!-- ── 目次 ────────────────────────────
-       12画面ぶんある。何がどこにあるか分からないまま読ませない。
-       中身は繰り返さず、行き先だけを置く。 -->
-  <nav class="toc" aria-labelledby="toc-h">
-    <h2 id="toc-h">この下にあるもの</h2>
-    <ul>
-      <li><a href="#net-h">3年分の動き</a></li>
-      <li><a href="#pay-h">振り込みまでの間</a></li>
-      <li><a href="#paid-h">書類に載る年収</a></li>
-      <li><a href="#care-h">保育料</a></li>
-      <li><a href="#fs-h">ふるさと納税</a></li>
-      <li><a href="#stat-h">ほかの男性の取得</a></li>
-      <li><a href="#lim-h">収入で変わるもの</a></li>
-      <li class="toc-break" aria-hidden="true"></li>
-      <li><a href="#co-h">会社への助成</a></li>
-      <li><a href="#hogo-h">法律で守られていること</a></li>
-      <li><a href="#app-h">出す書類と期限</a></li>
-      <li><a href="#table-h">細かい数字</a></li>
-      <li><a href="#dis-h">できること・できないこと</a></li>
-    </ul>
-    <p class="fine">区切りから下は、入力で数字が動かない制度の話です。</p>
-  </nav>
-
-  <!-- ── 手取りの推移 ───────────────────────── -->
-  <section class="panel" aria-labelledby="net-h">
-    <h2 id="net-h">3年分の動き</h2>
-    <p class="note">産休に入ってから、<span class="p-mother"></span>の復帰の2年後まで。二人合わせた手取りです。</p>
-
-    <div class="legend" role="list" id="net-legend"></div>
-
-    <div class="chart-wrap">
-      <svg id="net-chart" class="chart" role="img"></svg>
-      <div class="tip" id="net-tip" hidden></div>
     </div>
 
-    <p class="note" id="net-callout"></p>
-    <p class="fine">
-      線にボーナスは入れていません（その月だけ山になって、ほかの動きが見えなくなるため）。表と合計には入っています。
-    </p>
-  </section>
+    <label class="f slider">
+      <span><span class="p-father"></span>の育休の長さ</span>
+      <output id="father-months-out">1か月</output>
+      <input type="range" id="father-months" value="1" min="1" max="12" step="1">
+    </label>
 
-  <!-- ── 入金 ────────────────────────────── -->
-  <section class="panel" aria-labelledby="pay-h">
-    <h2 id="pay-h">給付金が振り込まれるまで</h2>
-    <p class="note"><strong>振り込みは毎月ではありません。</strong>2か月分をまとめて申請する仕組みだからです。</p>
-
-    <p class="callout warn" id="pay-callout"></p>
-
-    <div class="legend" role="list" id="pay-legend"></div>
-
-    <div class="chart-wrap">
-      <svg id="pay-chart" class="chart" role="img"
-           aria-label="給付金の振り込みの予定。いつ、いくら入るか。"></svg>
-      <div class="tip" id="pay-tip" hidden></div>
-    </div>
-
-    <details class="why">
-      <summary>どうして間が空くのか</summary>
-      <p class="note">
-        給付金そのものは毎月もらえますが、申請が2か月ごとなので、振り込みはそのあとになります。
-        <span class="p-mother"></span>は産休の分も産後にまとめて申請するのが普通なので、<strong>ここが一番長く空きます。</strong>
-        申請が通ってから振り込みまでは1週間ほどです。
-      </p>
-    </details>
-
-    <details>
-      <summary>振り込みの予定を全部見る</summary>
-      <div class="table-wrap">
-        <table id="pay-table">
-          <caption>時期は目安です。勤務先がいつ申請するかで前後します。</caption>
-          <thead>
-            <tr>
-              <th scope="col">だれ</th>
-              <th scope="col">いつごろ</th>
-              <th scope="col">どの期間の分</th>
-              <th scope="col">いくら</th>
-            </tr>
-          </thead>
-          <tbody></tbody>
-        </table>
+    <details class="more">
+      <summary>40歳以上の方がいるとき</summary>
+      <div class="extras">
+        <label class="check" data-role="father">
+          <input type="checkbox" class="p-over40"><span><span class="p-father"></span>が40歳以上</span></label>
+        <label class="check" data-role="mother">
+          <input type="checkbox" class="p-over40"><span><span class="p-mother"></span>が40歳以上</span></label>
+        <p class="ex-note">40歳から介護保険料がかかるので、引かれる額が少し増えます。</p>
       </div>
     </details>
   </section>
 
-  <!-- ── 源泉徴収票 ─────────────────────────── -->
-  <section class="panel" aria-labelledby="paid-h">
-    <h2 id="paid-h">書類に載る年収は下がります</h2>
-    <p class="note">
-      給付にも手当金にも税金がかからないので、<strong>源泉徴収票には載りません。</strong>
-      家計には入っているのに、書類の上の年収だけが減って見えます。
-    </p>
+  <!-- ── 結果 ────────────────────────────
+       大きい数字を1つ出すだけだと「多いのか少ないのか」が決まらない。比べる相手を2つ（ふだんの月・育休を取らない場合）、額と一緒に並べる。 -->
+  <section class="result" aria-labelledby="res-h">
+    <p class="sr-only" id="live-status" role="status" aria-live="polite" aria-atomic="true"></p>
+    <h2 id="res-h">育休中の手取り（ひと月あたり・二人合わせて）</h2>
+    <p class="period" id="res-period"></p>
+    <p class="big"><span id="net-value">—</span><span class="unit">万円</span></p>
+    <p class="parts" id="net-parts"></p>
 
-    <div id="paid-charts"></div>
+    <table class="cmp">
+      <caption class="sr-only">育休中の額と、比べる相手</caption>
+      <tbody id="cmp-body"></tbody>
+    </table>
 
-    <div class="who-looks">
-      <h3>この数字が使われる場面</h3>
-      <ul id="who-list"></ul>
-    </div>
-
-    <details class="why">
-      <summary>住宅ローンを考えているなら、健康診断のことも</summary>
-      <p class="note">
-        <strong>育休中は、会社の定期健康診断がありません。</strong>
-        健康診断は1年に1回行うことになっていますが、育休など休んでいる間は実施しなくてよいことになっていて、
-        <strong>休みが明けてから受ける</strong>という扱いです（労働安全衛生規則 第44条ほか）。
-      </p>
-      <p class="note">
-        これが住宅ローンにつながります。民間の住宅ローンは
-        <strong>団体信用生命保険（団信）への加入が条件</strong>になっていることが多く、
-        加入には健康状態の告知が必要で、保険会社の審査があります。
-        金融機関や借入額によっては、告知に加えて<strong>健康診断の結果を求められることがあります。</strong>
-      </p>
-      <p class="note">
-        つまり住宅ローンを申し込む時期に、<strong>書類の上の年収が下がって見えること</strong>と、
-        <strong>直近の健康診断の結果が手元にないこと</strong>が重なることがあります。
-        気になる場合は、育休に入る前に受けておく、あるいは復帰後に早めに受けておく、という手があります。
-      </p>
-      <p class="note">
-        なお<strong>フラット35は団信への加入が任意</strong>で、健康上の理由などで加入しない選択もできます
-        （その分金利の扱いが変わります）。
-        <strong>どの書類が要るかは金融機関ごとに違う</strong>ので、ここでは断定していません。
-        検討している金融機関に直接ご確認ください。
-      </p>
-      <p class="fine" id="kenshin-source"></p>
-    </details>
+    <p class="three" id="net-three"></p>
   </section>
 
-  <!-- ── 保育料 ──────────────────────────── -->
-  <section class="panel" aria-labelledby="care-h">
-    <h2 id="care-h">保育料は、二人の住民税で決まります</h2>
-    <p class="note">
-      段階を決めるのは<strong>二人の住民税を足した「所得割額」</strong>です。
-      <strong>金額そのものは出していません</strong>——自治体で区切りがかなり違うためです。
-    </p>
+  <!-- ── 線引き ──────────────────────────── -->
+  <p class="limit">
+    ボーナスは入れていません。出るのは目安です。この数字を基に決めて損失が出ても、<strong>作者は責任を負えません。</strong>
+  </p>
 
-    <p class="callout" id="care-callout"></p>
+  <details class="about" id="about">
+    <summary>当てはまる人・できないこと・前提・出典</summary>
 
-    <details>
-      <summary>年ごとの数字を見る</summary>
-      <div class="table-wrap">
-        <table id="care-table">
-          <caption>保育料の基になる、二人合わせた住民税の所得割額。</caption>
-          <thead>
-            <tr>
-              <th scope="col">保育料の期間</th>
-              <th scope="col">どの年の<br><small>収入で決まるか</small></th>
-              <th scope="col">二人合わせて<br><small class="take-label"></small></th>
-              <th scope="col">二人合わせて<br><small class="skip-label"></small></th>
-              <th scope="col">差</th>
-            </tr>
-          </thead>
-          <tbody></tbody>
-        </table>
-      </div>
-    </details>
-
-    <details class="why">
-      <summary>所得割額って何か・なぜ9月に切り替わるのか</summary>
-      <p class="note">
-        所得割額は、住民税のうち収入に応じて増える部分です（誰でも同じ額の「均等割」は入りません）。
+    <div class="about-body">
+      <p>
+        <strong>入力した内容は、この端末から出ません。</strong>計算は全てこの画面の中で終わり、どこかに送ることも、残すこともしていません。
       </p>
-      <p class="note">
-        ややこしいのは、<strong>年度の途中で基準が入れ替わる</strong>ところです。
-        4月から8月までと、9月から翌3月までとで、見られる年が1年ずれます。
-        住民税の額が6月ごろに決まるので、それを待って9月に切り替わるためです。
+      <p>
+        <strong>大まかな形をつかむための道具です。</strong>一円単位で合わせることは目指していません。実際の金額や手続きは、勤務先のご担当・お住まいの自治体・ハローワーク・税務署など、それぞれの窓口でご確認ください。
       </p>
-      <p class="note">
-        なお <strong>3歳からの保育料は無料</strong>で、0〜2歳は住民税がかからない世帯だけ無料です（こども家庭庁）。
-        つまり保育料がかかるのは0〜2歳、ちょうど育休明けの時期です。
+
+      <details id="scope">
+        <summary>当てはまらない場合</summary>
+      <p>
+        計算できるのは、<strong>二人とも雇用保険に入っていて、<span class="p-mother"></span>が産休から続けて育休を取る</strong>形だけです。次の場合、ここでの計算は当てはまりません。
       </p>
-    </details>
-  </section>
-
-  <!-- ── ふるさと納税 ───────────────────── -->
-  <section class="panel" aria-labelledby="fs-h">
-    <h2 id="fs-h">ふるさと納税は、いつもの額だと自己負担が増えます</h2>
-    <p class="note">
-      戻ってくる額の上限は<strong>寄付したその年の収入</strong>で決まります。
-      育休で下がる年に例年どおり寄付すると、超えた分が自己負担になります。
-    </p>
-
-    <p class="callout" id="fs-callout"></p>
-
-    <details>
-      <summary>年ごとの枠を見る</summary>
-      <div class="table-wrap">
-        <table id="fs-table">
-          <caption>住民税から戻る分の上限（所得割額の20%）。一人ずつ。</caption>
-          <thead></thead>
-          <tbody></tbody>
-        </table>
-      </div>
-    </details>
-
-    <details class="why">
-      <summary>この表が何の枠なのか</summary>
-      <p class="note">
-        はっきり計算できるのは一つだけです。住民税から戻る分のうち大きいほうには、
-        <strong>「住民税の所得割額の20%まで」</strong>という上限があります（総務省）。表はその枠です。
-      </p>
-      <p class="note">
-        <strong>寄付できる総額そのものは出していません</strong>——人によって控除の中身が違うので、
-        ふるさと納税サイトの目安表でご確認ください。
-      </p>
-    </details>
-  </section>
-
-  <!-- ── 統計 ────────────────────────────── -->
-  <section class="panel" aria-labelledby="stat-h">
-    <h2 id="stat-h">男性は、どのくらい取っているか</h2>
-
-    <p class="callout" id="stat-callout"></p>
-
-    <div id="stat-rates" class="stat-tiles"></div>
-
-    <h3 class="sub-title">取った男性が、どのくらいの長さ取っているか</h3>
-    <p class="note" id="stat-dur-note"></p>
-
-    <div id="stat-charts"></div>
-
-    <details class="why">
-      <summary>なぜこれを載せているか</summary>
-      <p class="note">
-        取りにくさは、お金だけの話ではないと思います。
-        <strong>「自分だけではない」と分かることのほうが効く</strong>こともあるので、載せています。
-        比べて競うためのものではないので、平均との比較や優劣は出していません。
-      </p>
-    </details>
-
-    <p class="fine" id="stat-source"></p>
-  </section>
-
-  <!-- ── 所得制限 ───────────────────────── -->
-  <section class="panel" aria-labelledby="lim-h">
-    <h2 id="lim-h">収入で変わるもの、変わらないもの</h2>
-    <p class="note">
-      <strong>子育て関係の制度は、収入で区切るのをやめる方向に動いています。</strong>
-      「前の年の収入で決まる」と思っていると行き違いが起きます。
-    </p>
-
-    <p class="callout" id="spouse-callout"></p>
-
-    <details>
-      <summary>制度ごとに見る</summary>
-    <div class="table-wrap">
-      <table id="limit-table">
-        <caption>収入で変わるかどうか。制度は動くので、出典元でもご確認ください。</caption>
-        <thead>
-          <tr>
-            <th scope="col">制度</th>
-            <th scope="col">収入で<br><small>変わるか</small></th>
-            <th scope="col">何を見るか</th>
-          </tr>
-        </thead>
-        <tbody></tbody>
-      </table>
-    </div>
-    </details>
-  </section>
-
-  <!-- ── ここから下は制度の話。数字は変わらないので畳んで置く ── -->
-  <div class="part-break">
-    <h2>ここから下は、制度の話です</h2>
-    <p>あなたの数字が動くのはここまで。以下は必要なときに開いてください。</p>
-  </div>
-
-  <!-- ── 会社側 ───────────────────────────── -->
-  <section class="panel" aria-labelledby="co-h">
-    <h2 id="co-h">会社の側にも、受け取れるものがあります</h2>
-    <p class="note">
-      育休を支えた会社には国からの助成があります。申請するのは会社なので、こちらから何かする必要はありません。
-    </p>
-    <details>
-      <summary>どんな仕組みがあるか見る</summary>
-      <div id="co-list"></div>
-      <p class="fine">
-        <strong>説得のための材料としてではなく</strong>、そういう仕組みがあるという事実として置いています。
-      </p>
-      <p class="fine" id="co-source"></p>
-    </details>
-  </section>
-
-  <!-- ── 守られていること ──────────────────── -->
-  <section class="panel protect" aria-labelledby="hogo-h">
-    <h2 id="hogo-h">法律で守られていること</h2>
-    <p class="note">不利益な扱いは禁じられていて、困ったときの相談先も決まっています。</p>
-    <details>
-      <summary>決められていることと、相談先を見る</summary>
-      <div id="hogo-list"></div>
-      <p class="fine" id="hogo-source"></p>
-    </details>
-  </section>
-
-  <!-- ── 申請 ────────────────────────────── -->
-  <section class="panel" aria-labelledby="app-h">
-    <h2 id="app-h">出す書類と、その期限</h2>
-    <p class="note">
-      ほとんどは勤務先が出してくれますが、<strong>出しそびれると給付が受けられなくなる</strong>ものがあります。
-    </p>
-    <details>
-      <summary>出す書類の一覧を見る</summary>
-      <div id="app-list"></div>
-      <p class="fine">期限がはっきりしているものだけ日付を入れています。</p>
-    </details>
-  </section>
-
-  <!-- ── 表 ──────────────────────────────── -->
-  <section class="panel" aria-labelledby="table-h">
-    <h2 id="table-h">細かい数字を見る</h2>
-    <details>
-      <summary>年ごとの表</summary>
-      <div class="table-wrap">
-        <table id="year-table">
-          <caption><span class="take-caption"></span>「書類に載る年収」はお給料とボーナスの合計で、給付金も出産手当金も入りません。</caption>
-          <thead></thead>
-          <tbody></tbody>
-        </table>
-      </div>
-    </details>
-    <details>
-      <summary>月ごとの表</summary>
-      <div class="table-wrap">
-        <table id="month-table">
-          <caption class="month-caption"></caption>
-          <thead>
-            <tr>
-              <th scope="col">年月</th>
-              <th scope="col">お給料など</th>
-              <th scope="col">給付金・手当金<br><small>その月の分</small></th>
-              <th scope="col">給付金<br><small>振り込み</small></th>
-              <th scope="col">社会保険料</th>
-              <th scope="col">所得税</th>
-              <th scope="col">住民税</th>
-              <th scope="col">手取り</th>
-            </tr>
-          </thead>
-          <tbody></tbody>
-        </table>
-      </div>
-    </details>
-  </section>
-
-  <!-- ── この道具について ───────────────────
-       できないこと・前提・出典を、この3つの節にだけ置く。
-       上の各セクションで同じ話を繰り返さず、ここへリンクする。 -->
-  <section class="panel disclaimer" id="disclaimer" aria-labelledby="dis-h">
-    <h2 id="dis-h">この道具でできること・できないこと</h2>
-    <p>
-      <strong>大まかな形をつかむための道具です。</strong>一円単位で合わせることは目指していません。
-    </p>
-    <p class="strong-note">
-      <strong>ここで出た数字を基に資産計画や借り入れ、寄付などを決めて損失が出ても、
-      作者は責任を負えません。</strong>
-      実際の金額や手続きは、勤務先のご担当・お住まいの自治体・ハローワーク・税務署など、
-      それぞれの窓口でご確認ください。
-    </p>
-
-    <details id="scope">
-      <summary>当てはまらない場合</summary>
-    <p>
-      計算できるのは、<strong>二人とも雇用保険に入っていて、<span class="p-mother"></span>が産休から続けて育休を取る</strong>形だけです。
-      次の場合、ここでの計算は当てはまりません。
-    </p>
-    <ul>
-      <li><span class="p-mother"></span>が育休を取らない・取れない場合（主に稼いでいる、職場の事情など）。</li>
-      <li>ひとり親の場合。</li>
-      <li>自営業やフリーランスなど、雇用保険に入っていない場合。</li>
-      <li>雇用保険に入っていた期間が足りない場合（休業に入る前の2年で、賃金の支払いの基になる日が11日以上ある月が12か月必要です）。</li>
-    </ul>
-    </details>
-
-    <details id="not-shown">
-      <summary>出していないもの</summary>
-    <p>
-      出せないものは出さない、と決めています。
-      どれも上のどこかで触れているので、ここには理由だけを並べます。
-    </p>
-    <dl>
-      <dt>いくら借りられるか</dt>
-      <dd>
-        住宅ローンの審査の基準は銀行ごとに違い、公開されていません。
-        出せるのは<a href="#paid-h">書類にこう載る</a>ところまでです。
-      </dd>
-      <dt>保育料の金額</dt>
-      <dd>
-        自治体によって<a href="#care-h">段階の区切り</a>がかなり違うためです。
-      </dd>
-      <dt>ふるさと納税で寄付できる総額</dt>
-      <dd>
-        人によって控除の中身が違うためです。
-        はっきり言えるのは<a href="#fs-h">住民税から戻る分の上限</a>までです。
-      </dd>
-      <dt>育休中のボーナスの額</dt>
-      <dd>
-        査定の期間が育休と重なったときの扱いは、会社ごとにかなり違います
-        （部署の平均にする、期間で割る、一律で減らす など）。決まったルールがないので、
-        いつもの何%かを入れてもらう形にしています。
-      </dd>
-      <dt>控除で税金がいくら減るか</dt>
-      <dd>
-        令和8年分の控除額の表がまだ公表されていないので、推測では出していません。
-        配偶者控除などは<a href="#lim-h">対象になるかどうか</a>だけをお伝えしています。
-      </dd>
-      <dt>団信に入れるかどうか</dt>
-      <dd>
-        健康状態の審査は保険会社が行うもので、必要な書類も金融機関ごとに違います。
-        <a href="#paid-h">書いているのは事実2つだけ</a>です。
-      </dd>
-      <dt>振り込みの正確な日付</dt>
-      <dd>勤務先がいつ申請するかで動きます。月の単位での目安としてご覧ください。</dd>
-      <dt>どうするのがよいか</dt>
-      <dd>
-        いまの制度で計算した結果を並べるだけの道具です。
-        個別のご相談にはお答えできません。
-      </dd>
-    </dl>
-    </details>
-
-    <details id="no-diff">
-      <summary>差が出ないので、あえて入れていないもの</summary>
-    <p>
-      この道具が答えるのは「父が育休を取るか、取らないか」の違いだけです。
-      <strong>どちらの場合も同じになるものは、差には入れていません。</strong>
-    </p>
-    <dl>
-      <dt>出産育児一時金と出産費用</dt>
-      <dd>
-        育休を取っても取らなくても同じ額で、しかも多くは出産費用で相殺されます。
-        この問いには関係しません。
-      </dd>
-      <dt>復帰したあとの時短勤務</dt>
-      <dd>
-        育休を取っても取らなくても時短にはします。片方だけに入れると、
-        <strong>ありもしない差</strong>を作ってしまうので入れていません。
-      </dd>
-      <dt>母の産休と育休そのもの</dt>
-      <dd>
-        どちらの場合も同じなので、差にはなりません。
-        ただし保育料の段階や書類に載る年収は「差」ではなく金額そのもので決まるので、
-        <strong>両方の場合に同じだけ入れて計算しています</strong>（外しているわけではありません）。
-      </dd>
-    </dl>
-    </details>
-  </section>
-
-  <!-- ── 前提 ────────────────────────────── -->
-  <section class="panel" aria-labelledby="assume-h">
-    <h2 id="assume-h">計算の前提</h2>
-    <p class="note">
-      どういう決めごとで計算しているかを、ここにまとめています。
-      <strong>ここに書いていないものは、見ていません。</strong>
-    </p>
-    <!-- 確かめきれていないことは畳まない。推測で埋めていないことが見えなくなる。 -->
-    <p class="callout" id="unverified"></p>
-    <details>
-      <summary>決めごとを全部見る</summary>
-      <ul class="assume">
-        <li>出産予定日どおりに生まれるものとして計算しています。</li>
-        <li>母は産前6週・産後8週の産休のあと、育休を子が1歳になるまで取る前提です。保育園に入れないときの1歳6か月・2歳への延長は入れていません。</li>
-        <li>父の育休は生まれた日から始まる前提です。あとから取る場合、出生後休業支援給付金（13%）の対象期間を外れることがあります。</li>
-        <li>産休・育休中はお給料もボーナスも出ない前提です（ボーナスは割合を入れれば計算に入ります）。</li>
-        <li>月の途中で休みに入る月のお給料は、暦の日数で日割りしています。社会保険料は標準報酬月額で決まるので、日割りしても月の額は変わりません。</li>
-        <li>出産手当金は、標準報酬月額のかわりに月のお給料をそのまま使っています（等級表には当てはめていません）。</li>
-        <li>扶養は考えず、基礎控除と社会保険料控除だけで計算しています。住宅ローン控除や医療費控除も入れていません。</li>
-        <li>健康保険料は協会けんぽの全国平均です。令和8年度は 9.44%（沖縄）〜10.55%（佐賀）の幅があるので、お住まいの都道府県の実際の率とは少し違います。</li>
-        <li>住民税は一人分・級地1を想定した目安です。均等割や非課税の基準は自治体で変わります。</li>
-        <li>所得税は1年分を、その月の額面の比で割り付けています。毎月の給与から引かれる額とは一致しません。</li>
-        <li>振り込みは「その2か月分が終わった翌月」に置いています。実際は勤務先の申請時期で前後します。</li>
-        <li>育休中に出たボーナスは、給付金を減らす対象には入れていません。</li>
-        <li>ボーナスの社会保険料が免除になるのは、ボーナスの月の末日に休業中で、かつ休業が1か月を超えるときです。</li>
+      <ul>
+        <li><span class="p-mother"></span>が育休を取らない・取れない場合（主に稼いでいる、職場の事情など）。</li>
+        <li>ひとり親の場合。</li>
+        <li>自営業やフリーランスなど、雇用保険に入っていない場合。</li>
+        <li>雇用保険に入っていた期間が足りない場合（休業に入る前の2年で、賃金の支払いの基になる日が11日以上ある月が12か月必要です）。</li>
       </ul>
-    </details>
-  </section>
+      </details>
 
-  <!-- ── 出典 ────────────────────────────── -->
-  <section class="panel" aria-labelledby="src-h">
-    <h2 id="src-h">数字の根拠にした資料</h2>
-    <p class="note">
-      制度は毎年変わります。<span id="rules-version"></span>
-    </p>
-    <details>
-      <summary>資料の一覧を見る</summary>
-      <ul class="sources" id="sources"></ul>
-    </details>
-  </section>
+      <details id="not-shown">
+        <summary>出していないもの</summary>
+      <p>
+        いまは<strong>「育休中、ひと月あたりの手取りはいくらか」だけ</strong>に絞っています。次のものは、計算はできていますが画面には出していません。
+      </p>
+      <ul>
+        <li>月ごとの手取りの動きと、給付金が振り込まれるまでの空白。</li>
+        <li>源泉徴収票に載る年収（給付は非課税なので、書類の上では下がって見えます）。</li>
+        <li>保育料の基になる所得割額と、ふるさと納税の枠。</li>
+        <li>ほかの男性がどのくらい取っているか。会社への助成、法律で守られていること、出す書類と期限。</li>
+      </ul>
+      <p>
+        どれも一度は画面に出していたものです。<strong>一度に置きすぎて、どこから読めばいいか分からなくなった</strong>ので、いったん外しました。順に戻します。
+      </p>
+      <p>
+        次は、そもそも<strong>出せないので出さない</strong>と決めているものです。
+      </p>
+      <dl>
+        <dt>いくら借りられるか</dt>
+        <dd>住宅ローンの審査の基準は銀行ごとに違い、公開されていません。</dd>
+        <dt>保育料の金額</dt>
+        <dd>自治体によって段階の区切りがかなり違うためです。</dd>
+        <dt>ふるさと納税で寄付できる総額</dt>
+        <dd>人によって控除の中身が違うためです。</dd>
+        <dt>ボーナス</dt>
+        <dd>
+          <strong>いまは計算に入れていません。</strong>査定の期間が育休と重なったときの扱いは会社ごとにかなり違い（部署の平均にする、期間で割る、一律で減らす など）、決まったルールがありません。<strong>入力を1つ増やしても答えが確からしくならない</strong>ので、出さないほうを選んでいます。ボーナスがある場合、住民税と所得税はここで出る額より重くなります。
+        </dd>
+        <dt>控除で税金がいくら減るか</dt>
+        <dd>令和8年分の控除額の表がまだ公表されていないので、推測では出していません。</dd>
+        <dt>どうするのがよいか</dt>
+        <dd>
+          いまの制度で計算した結果を並べるだけの道具です。個別のご相談にはお答えできません。
+        </dd>
+      </dl>
+      </details>
+
+      <details id="no-diff">
+        <summary>差が出ないので、あえて入れていないもの</summary>
+      <p>
+        この道具が答えるのは「<span class="p-father"></span>が育休を取るか、取らないか」の違いだけです。<strong>どちらの場合も同じになるものは、差には入れていません。</strong>
+      </p>
+      <dl>
+        <dt>出産育児一時金と出産費用</dt>
+        <dd>
+          育休を取っても取らなくても同じ額で、しかも多くは出産費用で相殺されます。この問いには関係しません。
+        </dd>
+        <dt>復帰したあとの時短勤務</dt>
+        <dd>
+          育休を取っても取らなくても時短にはします。片方だけに入れると、<strong>ありもしない差</strong>を作ってしまうので入れていません。
+        </dd>
+        <dt><span class="p-mother"></span>の産休と育休そのもの</dt>
+        <dd>
+          どちらの場合も同じなので、差にはなりません。ただし世帯の手取りの水準そのものは<span class="p-mother"></span>の休みで決まるので、<strong>両方の場合に同じだけ入れて計算しています</strong>（外しているわけではありません）。
+        </dd>
+      </dl>
+      </details>
+    </section>
+
+      <details>
+        <summary>計算の前提</summary>
+        <p>
+          どういう決めごとで計算しているかを、ここにまとめています。<strong>ここに書いていないものは、見ていません。</strong>
+        </p>
+        <p class="callout" id="unverified"></p>
+      <details>
+        <summary>決めごとを全部見る</summary>
+        <ul class="assume">
+          <li>お給料は<strong>万円単位</strong>で受け取り、出す額も<strong>0.1万円（1,000円）単位</strong>で丸めています。社会保険料は等級表、住民税は自治体で変わるので、<strong>一円単位の精度は出せません</strong>。</li>
+          <li>内訳の足し算が合うように、丸めの端数は<strong>いずれか1つの項に寄せています</strong>（寄せる先は、寄せても元の額から一番離れないものを選びます。ずれは最大1,000円）。</li>
+          <li>出産予定日どおりに生まれるものとして計算しています。</li>
+          <li><span class="p-mother"></span>は産前6週・産後8週の産休のあと、育休を子が1歳になるまで取る前提です（<strong>産後8週間は就業させてはならない</strong>ので——労基法65条——ここは動かせません）。保育園に入れないときの1歳6か月・2歳への延長は入れていません。</li>
+          <li><span class="p-father"></span>の育休は生まれた日から始まる前提です。あとから取る場合、出生後休業支援給付金（13%）の対象期間を外れることがあります。</li>
+          <li><strong>ボーナスは計算に入れていません。</strong>お給料だけで見ています。</li>
+          <li>産休・育休中はお給料が出ない前提です。</li>
+          <li>月の途中で休みに入る月のお給料は、暦の日数で日割りしています。社会保険料は標準報酬月額で決まるので、日割りしても月の額は変わりません。</li>
+          <li>出産手当金は、標準報酬月額のかわりに月のお給料をそのまま使っています（等級表には当てはめていません）。</li>
+          <li>扶養は考えず、基礎控除と社会保険料控除だけで計算しています。住宅ローン控除や医療費控除も入れていません。</li>
+          <li>健康保険料は協会けんぽの全国平均です。令和8年度は 9.44%（沖縄）〜10.55%（佐賀）の幅があるので、お住まいの都道府県の実際の率とは少し違います。</li>
+          <li>住民税は一人分・級地1を想定した目安です。均等割や非課税の基準は自治体で変わります。</li>
+          <li>所得税は1年分を、その月の額面の比で割り付けています。毎月の給与から引かれる額とは一致しません。</li>
+          <li>「ふだんの月」は年収から均して出した目安です。月ごとに計算した額とは1%ほどずれます（所得税の割り付け方が違うため）。</li>
+        </ul>
+      </details>
+      </details>
+
+      <details>
+        <summary>数字の根拠にした資料</summary>
+        <p>制度は毎年変わります。<span id="rules-version"></span></p>
+        <ul class="sources" id="sources"></ul>
+      </details>
+    </div>
+  </details>
 
 </main>
-
-<footer class="foot">
-  <p>
-    入力した内容は、この端末から出ません。計算は全てこの画面の中で終わり、
-    どこかに送ることも、残すこともしていません。
-  </p>
-  <p class="future">
-    いつか足したいこと: 介護休業や時短勤務など、ほかの休み方でお金がどう動くか。
-    いまは育児休業だけを扱っています。
-  </p>
-</footer>
-
-<div class="sticky-bar" id="sticky-bar" hidden>
-  <div class="sb-inner">
-    <label class="sb-slider">
-      <span class="sb-cap">育休 <b id="sb-months-out">1か月</b></span>
-      <input type="range" id="sb-months" value="1" min="1" max="12" step="1"
-             aria-label="お父さまの育休の長さ（か月）">
-    </label>
-    <a class="sb-result" href="#snap-h">
-      <span class="sb-label">二人とも家にいる間</span>
-      <span class="sb-value" id="sb-value">—</span>
-    </a>
-  </div>
-</div>
 
 <script type="module" src="app.js"></script>
 </body>
