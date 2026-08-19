@@ -21,11 +21,14 @@
   <header class="head">
     <p class="brand">やすめる</p>
     <h1>父が育休を取ると、お金はどうなるか</h1>
-    <p class="lead">パートナーの休みは固定。動かすのは<strong>あなたの月数だけ</strong>。</p>
+    <p class="lead">
+      パートナーの休みは固定（産後8週は法律で働けないため）。動かすのは<strong>あなたの月数だけ</strong>。
+    </p>
   </header>
 
   <!-- ── 入力 ────────────────────────────── -->
-  <section class="inputs" aria-label="条件を入れる">
+  <section class="inputs" aria-labelledby="in-h">
+    <h2 id="in-h" class="in-h">あなたの場合を入れる<small>いまの数字は例です</small></h2>
     <div class="grid">
       <label class="f">
         <span>出産予定日</span>
@@ -33,12 +36,12 @@
       </label>
 
       <label class="f" data-role="father">
-        <span>あなたの月のお給料<small>引かれる前</small></span>
+        <span>あなたの月給<small>引かれる前</small></span>
         <span class="field"><input type="number" class="p-salary" value="500000" min="0" step="10000" inputmode="numeric"><b class="echo" aria-hidden="true"></b></span>
       </label>
 
       <label class="f" data-role="mother">
-        <span>パートナーの月のお給料<small>引かれる前</small></span>
+        <span>パートナーの月給<small>引かれる前</small></span>
         <span class="field"><input type="number" class="p-salary" value="400000" min="0" step="10000" inputmode="numeric"><b class="echo" aria-hidden="true"></b></span>
       </label>
     </div>
@@ -81,11 +84,12 @@
 
   <!-- ── 線引き ──────────────────────────── -->
   <p class="limit">
-    ここで出るのは<strong>目安</strong>です。<strong>この数字を基に決めて損失が出ても、作者は責任を負えません。</strong>
+    <strong>ボーナスは入れていません。</strong>出るのは目安で、
+    <strong>この数字を基に決めて損失が出ても作者は責任を負えません。</strong>
   </p>
 
   <details class="about" id="about">
-    <summary>この道具でできないこと・計算の前提・出典</summary>
+    <summary>当てはまる人・できないこと・前提・出典</summary>
 
     <div class="about-body">
       <p>
@@ -203,6 +207,7 @@
           <li>健康保険料は協会けんぽの全国平均です。令和8年度は 9.44%（沖縄）〜10.55%（佐賀）の幅があるので、お住まいの都道府県の実際の率とは少し違います。</li>
           <li>住民税は一人分・級地1を想定した目安です。均等割や非課税の基準は自治体で変わります。</li>
           <li>所得税は1年分を、その月の額面の比で割り付けています。毎月の給与から引かれる額とは一致しません。</li>
+          <li>「ふだんの月」は年収から均して出した目安です。月ごとに計算した額とは1%ほどずれます（所得税の割り付け方が違うため）。</li>
         </ul>
       </details>
       </details>

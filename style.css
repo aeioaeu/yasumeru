@@ -142,6 +142,19 @@ h1 {
   padding: .65rem .8rem .25rem;
 }
 
+/* 入力の見出し。既定値が例だと分からないと、他人の数字を読むことになる */
+.in-h {
+  margin: 0 0 .4rem;
+  font-size: .8125rem;
+  letter-spacing: .02em;
+}
+.in-h small {
+  font-weight: 400;
+  font-size: .72rem;
+  color: var(--text-muted);
+  margin-left: .4rem;
+}
+
 .grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
@@ -512,5 +525,18 @@ input[type="range"]::-moz-range-thumb {
   body { padding-inline: .75rem; }
   .page { padding-top: .6rem; }
   .lead { margin-bottom: .6rem; }
-  .grid { gap: .4rem .6rem; }
+  /* 入力の見出し。既定値が例だと分からないと、他人の数字を読むことになる */
+.in-h {
+  margin: 0 0 .4rem;
+  font-size: .8125rem;
+  letter-spacing: .02em;
+}
+.in-h small {
+  font-weight: 400;
+  font-size: .72rem;
+  color: var(--text-muted);
+  margin-left: .4rem;
+}
+
+.grid { gap: .4rem .6rem; }
 }
