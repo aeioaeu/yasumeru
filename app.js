@@ -17,7 +17,7 @@ const man = (n) => `${manNum(man10(n))}万円`;
 
 // 画面に出す呼び方。入力欄は持たない（自分で名づけるものではない）。
 // 直書きすると、変えたときにそこだけ古いまま残るので、必ずここから取る。
-const LABELS = { father: 'あなた', mother: 'パートナー' };
+const LABELS = { father: '男性', mother: '女性' };
 
 // 月給は画面に、40歳以上は畳んだ中にある。
 // どちらも data-role で括ってあるので、役割で引けば場所を問わない。
@@ -102,7 +102,8 @@ function drawResult(house, months) {
   $('net-value').textContent = manNum(shown);
 
   // いつの、誰の話なのか。数字より先に置く
-  $('res-period').textContent = `あなたの育休 ${months}か月のあいだ（パートナーも休業中）`;
+  $('res-period').textContent =
+    `${LABELS.father}の育休 ${months}か月のあいだ（${LABELS.mother}も休業中）`;
 
   // 何でできている額なのかを開く。ここを畳むと「この数字は何なのか」が残らない。
   // 1画面に収めるため、人ごとの内訳までは出さず、足し引きだけにしてある。
