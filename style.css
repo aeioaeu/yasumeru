@@ -161,6 +161,30 @@ h1 {
   gap: .4rem .8rem;
 }
 
+/* 二人の月給は、横に2つか、縦に2つか。斜めに置かない。
+   1つのグリッドに3つ並べると、幅しだいで折り返しの位置が変わって斜めになる。 */
+.pair {
+  grid-column: 1 / -1;
+  display: grid;
+  /* 140px は「見出しが2行になるが横には並ぶ」ぎりぎりの幅。
+     150px にすると 360px の端末で縦積みになり、そのぶん縦を使う。 */
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  grid-template-rows: auto auto;   /* 1行目が見出し、2行目が欄 */
+  gap: .4rem .8rem;
+}
+/* 見出しの行を二人で共有する。片方だけ折り返したときに、
+   欄の高さがずれて斜めに見えるのを防ぐ。
+   subgrid が無いブラウザでは共有されないだけで、並び自体は壊れない。 */
+.pair > .f {
+  display: grid;
+  grid-template-rows: subgrid;
+  grid-row: span 2;
+  gap: .15rem;
+}
+/* 日付も行を独占させる。欄そのものは中身のぶんだけあればいい */
+.date { grid-column: 1 / -1; }
+.date input { max-width: 11rem; }
+
 .f {
   display: flex;
   flex-direction: column;

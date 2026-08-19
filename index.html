@@ -29,21 +29,26 @@
   <!-- ── 入力 ────────────────────────────── -->
   <section class="inputs" aria-labelledby="in-h">
     <h2 id="in-h" class="in-h">あなたの場合を入れる<small>いまの数字は例です</small></h2>
+    <!-- 月給2つは必ず同じ行に入れる。3つを auto-fit で並べると、
+         幅によっては「日付・あなた」「パートナー」の2行になって、
+         二人の欄が斜めに並んでしまう。 -->
     <div class="grid">
-      <label class="f">
+      <label class="f date">
         <span>出産予定日</span>
         <input type="date" id="birth-date" value="2026-10-15">
       </label>
 
-      <label class="f" data-role="father">
-        <span>あなたの月給<small>引かれる前</small></span>
-        <span class="field"><input type="number" class="p-salary" value="50" min="0" max="300" step="1" inputmode="numeric"><b class="unit">万円</b></span>
-      </label>
+      <div class="pair">
+        <label class="f" data-role="father">
+          <span>あなたの月給<small>引かれる前</small></span>
+          <span class="field"><input type="number" class="p-salary" value="50" min="0" max="300" step="1" inputmode="numeric"><b class="unit">万円</b></span>
+        </label>
 
-      <label class="f" data-role="mother">
-        <span>パートナーの月給<small>引かれる前</small></span>
-        <span class="field"><input type="number" class="p-salary" value="40" min="0" max="300" step="1" inputmode="numeric"><b class="unit">万円</b></span>
-      </label>
+        <label class="f" data-role="mother">
+          <span>パートナーの月給<small>引かれる前</small></span>
+          <span class="field"><input type="number" class="p-salary" value="40" min="0" max="300" step="1" inputmode="numeric"><b class="unit">万円</b></span>
+        </label>
+      </div>
     </div>
 
     <label class="f slider">
