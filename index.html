@@ -12,29 +12,22 @@
 </head>
 <body>
 
-<!-- 1画面に収める。入力とその結果が同時に見えていないと、
-     スライダーを動かしても何が変わったのか分からない。
-     読む必要があるが場所を取るもの（できないこと・前提・出典）は、
-     消さずに1つの details に畳んである。 -->
+<!-- 1画面に収める。入力とその結果が同時に見えていないと、スライダーを動かしても何が変わったのか分からない。読む必要があるが場所を取るもの（できないこと・前提・出典）は、消さずに1つの details に畳んである。 -->
 <main class="page">
 
   <header class="head">
     <p class="brand">やすめる</p>
     <h1>パパが育休を取ると、お金はどうなるか</h1>
     <p class="lead">
-      <span class="p-mother"></span>の休みは固定（産後8週は法律で働けないため）。動かすのは<strong><span class="p-father"></span>の月数だけ</strong>。
+      <span class="p-mother"></span>の休みは固定（産後8週は法律で休む決まり）。<span class="nb">動かすのは<strong><span class="p-father"></span>の月数だけ</strong>。</span>
     </p>
   </header>
 
   <!-- ── 入力 ────────────────────────────── -->
   <section class="inputs" aria-label="条件を入れる">
-    <!-- 見出しは置かない。欄のラベルが「パパの月給」なので、
-         その上に「赤ちゃんのパパとママ」と書いても何も足さない。
-         ここで要るのは「いまの数字は自分のものではない」という合図だけ。 -->
+    <!-- 見出しは置かない。欄のラベルが「パパの月給」なので、その上に「赤ちゃんのパパとママ」と書いても何も足さない。ここで要るのは「いまの数字は自分のものではない」という合図だけ。 -->
     <p class="in-h">いまの数字は例です。<strong>入れ替えてください。</strong></p>
-    <!-- 月給2つは必ず同じ行に入れる。3つを auto-fit で並べると、
-         幅によっては「日付・パパ」「ママ」の2行になって、
-         二人の欄が斜めに並んでしまう。 -->
+    <!-- 月給2つは必ず同じ行に入れる。3つを auto-fit で並べると、幅によっては「日付・パパ」「ママ」の2行になって、二人の欄が斜めに並んでしまう。 -->
     <div class="grid">
       <label class="f date">
         <span>出産予定日</span>
@@ -43,13 +36,11 @@
 
       <div class="pair">
         <label class="f" data-role="father">
-          <span><span class="p-father"></span>の月給<small>引かれる前</small></span>
-          <span class="field"><input type="number" class="p-salary" value="50" min="0" max="300" step="1" inputmode="numeric"><b class="unit">万円</b></span>
+          <span><span class="p-father"></span>の月給<small>引かれる前</small></span><span class="field"><input type="number" class="p-salary" value="50" min="0" max="300" step="1" inputmode="numeric"><b class="unit">万円</b></span>
         </label>
 
         <label class="f" data-role="mother">
-          <span><span class="p-mother"></span>の月給<small>引かれる前</small></span>
-          <span class="field"><input type="number" class="p-salary" value="40" min="0" max="300" step="1" inputmode="numeric"><b class="unit">万円</b></span>
+          <span><span class="p-mother"></span>の月給<small>引かれる前</small></span><span class="field"><input type="number" class="p-salary" value="40" min="0" max="300" step="1" inputmode="numeric"><b class="unit">万円</b></span>
         </label>
       </div>
     </div>
@@ -73,11 +64,10 @@
   </section>
 
   <!-- ── 結果 ────────────────────────────
-       大きい数字を1つ出すだけだと「多いのか少ないのか」が決まらない。
-       比べる相手を2つ（ふだんの月・育休を取らない場合）、額と一緒に並べる。 -->
+       大きい数字を1つ出すだけだと「多いのか少ないのか」が決まらない。比べる相手を2つ（ふだんの月・育休を取らない場合）、額と一緒に並べる。 -->
   <section class="result" aria-labelledby="res-h">
     <p class="sr-only" id="live-status" role="status" aria-live="polite" aria-atomic="true"></p>
-    <h2 id="res-h">育休中の、ひと月あたりの手取り（二人合わせて）</h2>
+    <h2 id="res-h">育休中の手取り（ひと月あたり・二人合わせて）</h2>
     <p class="period" id="res-period"></p>
     <p class="big"><span id="net-value">—</span><span class="unit">万円</span></p>
     <p class="parts" id="net-parts"></p>
@@ -92,8 +82,7 @@
 
   <!-- ── 線引き ──────────────────────────── -->
   <p class="limit">
-    <strong>ボーナスは入れていません。</strong>出るのは目安で、
-    <strong>この数字を基に決めて損失が出ても作者は責任を負えません。</strong>
+    ボーナスは入れていません。出るのは目安です。この数字を基に決めて損失が出ても、<strong>作者は責任を負えません。</strong>
   </p>
 
   <details class="about" id="about">
@@ -101,20 +90,16 @@
 
     <div class="about-body">
       <p>
-        <strong>入力した内容は、この端末から出ません。</strong>計算は全てこの画面の中で終わり、
-        どこかに送ることも、残すこともしていません。
+        <strong>入力した内容は、この端末から出ません。</strong>計算は全てこの画面の中で終わり、どこかに送ることも、残すこともしていません。
       </p>
       <p>
-        <strong>大まかな形をつかむための道具です。</strong>一円単位で合わせることは目指していません。
-        実際の金額や手続きは、勤務先のご担当・お住まいの自治体・ハローワーク・税務署など、
-        それぞれの窓口でご確認ください。
+        <strong>大まかな形をつかむための道具です。</strong>一円単位で合わせることは目指していません。実際の金額や手続きは、勤務先のご担当・お住まいの自治体・ハローワーク・税務署など、それぞれの窓口でご確認ください。
       </p>
 
       <details id="scope">
         <summary>当てはまらない場合</summary>
       <p>
-        計算できるのは、<strong>二人とも雇用保険に入っていて、<span class="p-mother"></span>が産休から続けて育休を取る</strong>形だけです。
-        次の場合、ここでの計算は当てはまりません。
+        計算できるのは、<strong>二人とも雇用保険に入っていて、<span class="p-mother"></span>が産休から続けて育休を取る</strong>形だけです。次の場合、ここでの計算は当てはまりません。
       </p>
       <ul>
         <li><span class="p-mother"></span>が育休を取らない・取れない場合（主に稼いでいる、職場の事情など）。</li>
@@ -127,8 +112,7 @@
       <details id="not-shown">
         <summary>出していないもの</summary>
       <p>
-        いまは<strong>「育休中、ひと月あたりの手取りはいくらか」だけ</strong>に絞っています。
-        次のものは、計算はできていますが画面には出していません。
+        いまは<strong>「育休中、ひと月あたりの手取りはいくらか」だけ</strong>に絞っています。次のものは、計算はできていますが画面には出していません。
       </p>
       <ul>
         <li>月ごとの手取りの動きと、給付金が振り込まれるまでの空白。</li>
@@ -137,8 +121,7 @@
         <li>ほかの男性がどのくらい取っているか。会社への助成、法律で守られていること、出す書類と期限。</li>
       </ul>
       <p>
-        どれも一度は画面に出していたものです。<strong>一度に置きすぎて、どこから読めばいいか
-        分からなくなった</strong>ので、いったん外しました。順に戻します。
+        どれも一度は画面に出していたものです。<strong>一度に置きすぎて、どこから読めばいいか分からなくなった</strong>ので、いったん外しました。順に戻します。
       </p>
       <p>
         次は、そもそも<strong>出せないので出さない</strong>と決めているものです。
@@ -152,17 +135,13 @@
         <dd>人によって控除の中身が違うためです。</dd>
         <dt>ボーナス</dt>
         <dd>
-          <strong>いまは計算に入れていません。</strong>査定の期間が育休と重なったときの扱いは
-          会社ごとにかなり違い（部署の平均にする、期間で割る、一律で減らす など）、
-          決まったルールがありません。<strong>入力を1つ増やしても答えが確からしくならない</strong>ので、
-          出さないほうを選んでいます。ボーナスがある場合、住民税と所得税はここで出る額より重くなります。
+          <strong>いまは計算に入れていません。</strong>査定の期間が育休と重なったときの扱いは会社ごとにかなり違い（部署の平均にする、期間で割る、一律で減らす など）、決まったルールがありません。<strong>入力を1つ増やしても答えが確からしくならない</strong>ので、出さないほうを選んでいます。ボーナスがある場合、住民税と所得税はここで出る額より重くなります。
         </dd>
         <dt>控除で税金がいくら減るか</dt>
         <dd>令和8年分の控除額の表がまだ公表されていないので、推測では出していません。</dd>
         <dt>どうするのがよいか</dt>
         <dd>
-          いまの制度で計算した結果を並べるだけの道具です。
-          個別のご相談にはお答えできません。
+          いまの制度で計算した結果を並べるだけの道具です。個別のご相談にはお答えできません。
         </dd>
       </dl>
       </details>
@@ -170,25 +149,20 @@
       <details id="no-diff">
         <summary>差が出ないので、あえて入れていないもの</summary>
       <p>
-        この道具が答えるのは「<span class="p-father"></span>が育休を取るか、取らないか」の違いだけです。
-        <strong>どちらの場合も同じになるものは、差には入れていません。</strong>
+        この道具が答えるのは「<span class="p-father"></span>が育休を取るか、取らないか」の違いだけです。<strong>どちらの場合も同じになるものは、差には入れていません。</strong>
       </p>
       <dl>
         <dt>出産育児一時金と出産費用</dt>
         <dd>
-          育休を取っても取らなくても同じ額で、しかも多くは出産費用で相殺されます。
-          この問いには関係しません。
+          育休を取っても取らなくても同じ額で、しかも多くは出産費用で相殺されます。この問いには関係しません。
         </dd>
         <dt>復帰したあとの時短勤務</dt>
         <dd>
-          育休を取っても取らなくても時短にはします。片方だけに入れると、
-          <strong>ありもしない差</strong>を作ってしまうので入れていません。
+          育休を取っても取らなくても時短にはします。片方だけに入れると、<strong>ありもしない差</strong>を作ってしまうので入れていません。
         </dd>
         <dt><span class="p-mother"></span>の産休と育休そのもの</dt>
         <dd>
-          どちらの場合も同じなので、差にはなりません。
-          ただし世帯の手取りの水準そのものは<span class="p-mother"></span>の休みで決まるので、
-          <strong>両方の場合に同じだけ入れて計算しています</strong>（外しているわけではありません）。
+          どちらの場合も同じなので、差にはなりません。ただし世帯の手取りの水準そのものは<span class="p-mother"></span>の休みで決まるので、<strong>両方の場合に同じだけ入れて計算しています</strong>（外しているわけではありません）。
         </dd>
       </dl>
       </details>
@@ -197,8 +171,7 @@
       <details>
         <summary>計算の前提</summary>
         <p>
-          どういう決めごとで計算しているかを、ここにまとめています。
-          <strong>ここに書いていないものは、見ていません。</strong>
+          どういう決めごとで計算しているかを、ここにまとめています。<strong>ここに書いていないものは、見ていません。</strong>
         </p>
         <p class="callout" id="unverified"></p>
       <details>

@@ -132,6 +132,9 @@ h1 {
   color: var(--text-secondary);
 }
 .lead strong { color: var(--text-primary); }
+/* 2文目を割らない。「動かすの／はパパの月数だけ」と折れると、
+   行の切れ目が文の切れ目とずれて読みにくい */
+.nb { white-space: nowrap; }
 
 /* ── 入力 ──────────────────────────── */
 
@@ -257,7 +260,7 @@ h1 {
   font-size: .8125rem;
   font-weight: 700;
   letter-spacing: .02em;
-  color: var(--text-secondary);
+  color: var(--text-primary);
 }
 
 .big {
@@ -272,7 +275,12 @@ h1 {
   letter-spacing: -.01em;
   line-height: 1.15;
 }
-.big .unit { font-size: .95rem; font-weight: 600; margin-left: -.35rem; }
+.big .unit {
+  font-size: .95rem;
+  font-weight: 600;
+  margin-left: -.35rem;
+  color: var(--text-secondary);
+}
 
 /* いつの・誰の話か。数字の意味は数字より先に置く */
 .period {
@@ -311,6 +319,9 @@ h1 {
 .cmp-note.up { color: var(--ok); }
 .cmp-note.down { color: var(--text-muted); }
 
+.parts .n { color: var(--text-primary); }
+/* 「＋」だけが行末に残ると、演算子と項が別の行に割れて読む順が切れる */
+.parts .term { white-space: nowrap; }
 .parts {
   margin: 0 0 .3rem;
   padding: .3rem .45rem;

@@ -114,10 +114,15 @@ function drawResult(house, months) {
     m.take.mother.shahoOnSalary + m.take.father.shahoOnSalary +
     m.take.mother.incomeTax + m.take.father.incomeTax + m.residentTax);
   const [g, s, c] = balance([got, salary, cut], [1, 1, -1], shown);
+  // 数字だけ色を濃くする。足し算を追う人が数字だけを拾えるように。
+  // 太字にはしない（この行に太字を足すと、画面の太字が4つになる）。
+  // 項ごとに包んで折り返さないようにする。演算子だけが行末に取り残されると、
+  // 「＋」と「お給料 24.6万円」が別の行に割れて、読む順が切れる。
+  const term = (label, v) => `<span class="term">${label} <span class="n">${manNum(v)}万円</span></span>`;
   $('net-parts').innerHTML =
-    `内訳：給付金と手当金 ${manNum(g)}万円` +
-    (house.shusseigo.take.father > 0 ? '（最初の28日は+13%）' : '') +
-    ` ＋ お給料 ${manNum(s)}万円 − 税・社会保険料 ${manNum(c)}万円`;
+    `内訳：${term('給付金と手当金', g)}` +
+    (house.shusseigo.take.father > 0 ? '<span class="term">（最初の28日は+13%）</span>' : '') +
+    ` ${term('＋ お給料', s)} ${term('− 税・社会保険料', c)}`;
 
   // 比べる相手を2つ並べる。どちらも「いまの額」を主語にして書く。
   // 差だけ・割合だけを出すと、何を基準にした数字なのかが読み取れない。
@@ -143,7 +148,7 @@ function drawResult(house, months) {
   // 差額は入口にしない。答えを見たあとに、1行だけ置く
   const d = house.summary.diff;
   $('net-three').textContent =
-    `3年の合計では 取らない場合より ${d < 0 ? `−${man(-d)}` : `+${man(d)}`}`;
+    `3年の合計では、取らない場合より ${d < 0 ? `−${man(-d)}` : `+${man(d)}`}`;
 
   // 読み上げには、変わった結果を一文で渡す（数字だけ読み上げても意味にならない）
   $('live-status').textContent =
@@ -174,7 +179,8 @@ function drawAbout() {
     '住民税の調整控除で使う「人的控除の差」を5万円としています。' +
     '令和8年度の改正で増えた基礎控除の分は、この差には反映されない前提です。'
   );
-  $('unverified').innerHTML = `<strong>確かめきれていないこと</strong>：${unverified.join(' ')}`;
+  // 半角スペースでつなぐと、日本語の文のあいだに空きができる。句点で足りる
+  $('unverified').innerHTML = `<strong>確かめきれていないこと</strong>：${unverified.join('')}`;
 
   $('rules-version').textContent =
     `${RULES.version} 版です。${RULES.validUntil} を過ぎたら、数字を確認し直す必要があります。`;
