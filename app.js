@@ -1,5 +1,10 @@
-import { RULES, SOURCES } from './rules-2026.js';
-import { simulateHousehold } from './calc.js';
+// index.html が付けた ?v= を、そのまま calc.js と rules-2026.js にも引き継ぐ。
+// ここを静的な import にすると、HTML と app.js だけ新しくて calc.js が
+// キャッシュのまま古い、という組み合わせが起きる。版を上げる場所を
+// index.html の1か所に閉じるための書き方。
+const V = new URL(import.meta.url).search;
+const { RULES, SOURCES } = await import(`./rules-2026.js${V}`);
+const { simulateHousehold } = await import(`./calc.js${V}`);
 
 const $ = (id) => document.getElementById(id);
 
