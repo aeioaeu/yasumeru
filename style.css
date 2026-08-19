@@ -145,6 +145,30 @@ h1 {
   padding: .65rem .8rem .25rem;
 }
 
+/* 読み込みに失敗したときだけ出る。黙って壊れた画面を見せない */
+.load-error {
+  margin: .6rem 0 0;
+  padding: .6rem .7rem;
+  font-size: .8125rem;
+  color: var(--text-primary);
+  background: var(--surface-1);
+  border: 1px solid var(--series-2);
+  border-radius: var(--radius);
+}
+.load-error[hidden] { display: none; }
+.load-error button {
+  margin-left: .5rem;
+  min-height: 40px;
+  padding: .3rem .8rem;
+  font: inherit;
+  font-size: .8125rem;
+  color: var(--link);
+  background: var(--surface-0);
+  border: 1px solid var(--border-strong);
+  border-radius: 6px;
+  cursor: pointer;
+}
+
 /* 既定値が例だと分からないと、他人の数字を自分の数字として読むことになる */
 .in-h {
   margin: 0 0 .4rem;
@@ -562,7 +586,31 @@ input[type="range"]::-moz-range-thumb {
   body { padding-inline: .75rem; }
   .page { padding-top: .6rem; }
   .lead { margin-bottom: .6rem; }
-  /* 既定値が例だと分からないと、他人の数字を自分の数字として読むことになる */
+  /* 読み込みに失敗したときだけ出る。黙って壊れた画面を見せない */
+.load-error {
+  margin: .6rem 0 0;
+  padding: .6rem .7rem;
+  font-size: .8125rem;
+  color: var(--text-primary);
+  background: var(--surface-1);
+  border: 1px solid var(--series-2);
+  border-radius: var(--radius);
+}
+.load-error[hidden] { display: none; }
+.load-error button {
+  margin-left: .5rem;
+  min-height: 40px;
+  padding: .3rem .8rem;
+  font: inherit;
+  font-size: .8125rem;
+  color: var(--link);
+  background: var(--surface-0);
+  border: 1px solid var(--border-strong);
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+/* 既定値が例だと分からないと、他人の数字を自分の数字として読むことになる */
 .in-h {
   margin: 0 0 .4rem;
   font-size: .75rem;
