@@ -60,9 +60,9 @@ function drawResult(house, months) {
 
   if (!overlap.length) {
     $('net-value').textContent = '—';
-    $('net-ratio').textContent = '';
-    $('net-vs').textContent = '';
+    $('res-period').textContent = '';
     $('net-parts').textContent = '';
+    $('cmp-body').innerHTML = '';
     $('net-three').textContent = '';
     return;
   }
@@ -72,15 +72,9 @@ function drawResult(house, months) {
   const ratio = sn.normalNet > 0 ? Math.round((during / sn.normalNet) * 100) : null;
 
   $('net-value').textContent = fmt(during);
-  $('net-ratio').textContent = ratio != null ? `いつもの ${ratio}%` : '';
 
-  // 「取らない場合」を並べないと、この額が高いのか低いのか決まらない
-  const gap = during - withoutFather;
-  $('net-vs').innerHTML =
-    `育休を取らない場合は ${fmt(withoutFather)}円。` +
-    (gap >= 0
-      ? `<b>取ったほうが ${fmt(gap)}円 多くなります。</b>`
-      : `差は ${fmt(-gap)}円 です。`);
+  // いつの、誰の話なのか。数字より先に置く
+  $('res-period').textContent = `あなたの育休 ${months}か月のあいだ（パートナーも休業中）`;
 
   // 何でできている額なのかを開く。ここを畳むと「この数字は何なのか」が残らない。
   // 1画面に収めるため、人ごとの内訳までは出さず、足し引きだけにしてある。
@@ -91,20 +85,35 @@ function drawResult(house, months) {
     m.take.mother.shahoOnSalary + m.take.father.shahoOnSalary +
     m.take.mother.incomeTax + m.take.father.incomeTax + m.residentTax);
   $('net-parts').innerHTML =
-    `内訳：給付と手当金 ${fmt(got)}円` +
-    (house.shusseigo.take.father > 0 ? '（初めの28日は13%上乗せ）' : '') +
-    ` ＋ お給料 ${fmt(salary)}円 − 引かれるもの ${fmt(cut)}円`;
+    `内訳：給付金と手当金 ${fmt(got)}円` +
+    (house.shusseigo.take.father > 0 ? '（最初の28日は+13%）' : '') +
+    ` ＋ お給料 ${fmt(salary)}円 − 税・社会保険料 ${fmt(cut)}円`;
+
+  // 比べる相手を2つ並べる。どちらも「いまの額」を主語にして書く。
+  // 差だけ・割合だけを出すと、何を基準にした数字なのかが読み取れない。
+  const gap = during - withoutFather;
+  const rows = [
+    ['ふだんの月', sn.normalNet, ratio != null ? `いまはその ${ratio}%` : '', 'down'],
+    ['取らない場合', withoutFather,
+      gap >= 0 ? `いまのほうが ${fmt(gap)}円 多い` : `いまのほうが ${fmt(-gap)}円 少ない`,
+      gap >= 0 ? 'up' : 'down'],
+  ];
+  $('cmp-body').innerHTML = rows.map(([label, value, note, tone]) =>
+    `<tr><th scope="row">${label}</th>` +
+    `<td><b class="cmp-yen">${fmt(value)}円</b>` +
+    `<span class="cmp-note ${tone}">${note}</span></td></tr>`
+  ).join('');
 
   // 差額は入口にしない。答えを見たあとに、1行だけ置く
   const d = house.summary.diff;
   $('net-three').textContent =
-    `3年で見ると 二人合わせて ${d < 0 ? `−${man(-d)}` : `+${man(d)}`}` +
-    `（${house.summary.monthsShown}か月分の合計）`;
+    `3年の合計では 取らない場合より ${d < 0 ? `−${man(-d)}` : `+${man(d)}`}`;
 
   // 読み上げには、変わった結果を一文で渡す（数字だけ読み上げても意味にならない）
   $('live-status').textContent =
     `${LABELS.father}の育休は${months}か月。` +
-    `二人とも家にいる間の世帯の手取りは、月およそ ${fmt(during)}円です。`;
+    `そのあいだの世帯の手取りは、ひと月あたり およそ ${fmt(during)}円。` +
+    `育休を取らない場合は ${fmt(withoutFather)}円です。`;
 }
 
 // 500000 は桁を数えないと読めない。普段は「50万円」で考えている。

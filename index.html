@@ -21,7 +21,7 @@
   <header class="head">
     <p class="brand">やすめる</p>
     <h1>父が育休を取ると、お金はどうなるか</h1>
-    <p class="lead">母は上限まで取る前提で固定。動かすのは<strong>父の月数だけ</strong>です。</p>
+    <p class="lead">パートナーの休みは固定。動かすのは<strong>あなたの月数だけ</strong>。</p>
   </header>
 
   <!-- ── 入力 ────────────────────────────── -->
@@ -33,55 +33,59 @@
       </label>
 
       <label class="f" data-role="father">
-        <span>お父さまの月のお給料<small>引かれる前</small></span>
+        <span>あなたの月のお給料<small>引かれる前</small></span>
         <span class="field"><input type="number" class="p-salary" value="500000" min="0" step="10000" inputmode="numeric"><b class="echo" aria-hidden="true"></b></span>
       </label>
 
       <label class="f" data-role="mother">
-        <span>お母さまの月のお給料<small>引かれる前</small></span>
+        <span>パートナーの月のお給料<small>引かれる前</small></span>
         <span class="field"><input type="number" class="p-salary" value="400000" min="0" step="10000" inputmode="numeric"><b class="echo" aria-hidden="true"></b></span>
       </label>
     </div>
 
     <label class="f slider">
-      <span>お父さまの育休の長さ</span>
+      <span>あなたの育休の長さ</span>
       <output id="father-months-out">1か月</output>
       <input type="range" id="father-months" value="1" min="1" max="12" step="1">
     </label>
 
     <details class="more">
-      <summary>40歳以上のとき</summary>
+      <summary>40歳以上の方がいるとき</summary>
       <div class="extras">
         <label class="check" data-role="father">
-          <input type="checkbox" class="p-over40"><span>お父さまが40歳以上</span></label>
+          <input type="checkbox" class="p-over40"><span>あなたが40歳以上</span></label>
         <label class="check" data-role="mother">
-          <input type="checkbox" class="p-over40"><span>お母さまが40歳以上</span></label>
-        <p class="ex-note">
-          40歳から介護保険料がかかります。産後8週間は就業させてはならないので（労基法65条）、
-          お母さまの休みは固定です。
-        </p>
+          <input type="checkbox" class="p-over40"><span>パートナーが40歳以上</span></label>
+        <p class="ex-note">40歳から介護保険料がかかるので、引かれる額が少し増えます。</p>
       </div>
     </details>
   </section>
 
-  <!-- ── 結果 ────────────────────────────── -->
+  <!-- ── 結果 ────────────────────────────
+       大きい数字を1つ出すだけだと「多いのか少ないのか」が決まらない。
+       比べる相手を2つ（ふだんの月・育休を取らない場合）、額と一緒に並べる。 -->
   <section class="result" aria-labelledby="res-h">
-    <p class="sr-only" id="live-status" role="status" aria-live="polite"></p>
-    <h2 id="res-h">二人とも家にいる間、世帯の手取り</h2>
-    <p class="big"><span id="net-value">—</span><span class="unit">円</span><span class="per">／月</span>
-      <span class="ratio" id="net-ratio"></span></p>
-    <p class="vs" id="net-vs"></p>
+    <p class="sr-only" id="live-status" role="status" aria-live="polite" aria-atomic="true"></p>
+    <h2 id="res-h">育休中の、ひと月あたりの手取り（二人合わせて）</h2>
+    <p class="period" id="res-period"></p>
+    <p class="big"><span id="net-value">—</span><span class="unit">円</span></p>
     <p class="parts" id="net-parts"></p>
+
+    <table class="cmp">
+      <caption class="sr-only">いまの額と、比べる相手</caption>
+      <tbody id="cmp-body"></tbody>
+    </table>
+
     <p class="three" id="net-three"></p>
   </section>
 
   <!-- ── 線引き ──────────────────────────── -->
   <p class="limit">
-    出るのは<strong>目安</strong>です。<strong>これを基に決めて損失が出ても、作者は責任を負えません。</strong>
+    ここで出るのは<strong>目安</strong>です。<strong>この数字を基に決めて損失が出ても、作者は責任を負えません。</strong>
   </p>
 
   <details class="about" id="about">
-    <summary>できないこと・当てはまらない場合・前提・出典</summary>
+    <summary>この道具でできないこと・計算の前提・出典</summary>
 
     <div class="about-body">
       <p>
@@ -111,7 +115,7 @@
       <details id="not-shown">
         <summary>出していないもの</summary>
       <p>
-        いまは<strong>「二人とも家にいる間、世帯の手取りはいくらか」だけ</strong>に絞っています。
+        いまは<strong>「育休中、ひと月あたりの手取りはいくらか」だけ</strong>に絞っています。
         次のものは、計算はできていますが画面には出していません。
       </p>
       <ul>
@@ -189,7 +193,7 @@
         <summary>決めごとを全部見る</summary>
         <ul class="assume">
           <li>出産予定日どおりに生まれるものとして計算しています。</li>
-          <li>母は産前6週・産後8週の産休のあと、育休を子が1歳になるまで取る前提です。保育園に入れないときの1歳6か月・2歳への延長は入れていません。</li>
+          <li>母は産前6週・産後8週の産休のあと、育休を子が1歳になるまで取る前提です（<strong>産後8週間は就業させてはならない</strong>ので——労基法65条——ここは動かせません）。保育園に入れないときの1歳6か月・2歳への延長は入れていません。</li>
           <li>父の育休は生まれた日から始まる前提です。あとから取る場合、出生後休業支援給付金（13%）の対象期間を外れることがあります。</li>
           <li><strong>ボーナスは計算に入れていません。</strong>お給料だけで見ています。</li>
           <li>産休・育休中はお給料が出ない前提です。</li>

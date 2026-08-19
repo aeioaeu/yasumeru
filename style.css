@@ -25,6 +25,9 @@
   /* 文字として置く青。--series-1 は線と面の色で、明るい地の上では
      小さい文字に足りない（4.0:1）。リンクと小見出しはこちらを使う。 */
   --link: #1f68c4;
+  /* 「多い／少ない」を色でも示すところ。--series-3 は面と線の色で、
+     明るい地の小さい文字では 2.74:1 しかない。文字用はこちら（5.2:1）。 */
+  --ok: #14795a;
 
   --radius: 10px;
   --maxw: 860px;
@@ -51,6 +54,7 @@
     --grid: #2b2b28;
     --accent-soft: rgba(57, 135, 229, 0.16);
     --link: #4d94ea;
+    --ok: #3fc994;
   }
 }
 
@@ -74,6 +78,7 @@
   --grid: #2b2b28;
   --accent-soft: rgba(57, 135, 229, 0.16);
   --link: #4d94ea;
+  --ok: #3fc994;
 }
 
 * { box-sizing: border-box; }
@@ -134,7 +139,7 @@ h1 {
   background: var(--surface-1);
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  padding: .7rem .8rem .3rem;
+  padding: .65rem .8rem .25rem;
 }
 
 .grid {
@@ -208,8 +213,8 @@ h1 {
 /* ── 結果 ──────────────────────────── */
 
 .result {
-  margin: .5rem 0 .4rem;
-  padding: .7rem .8rem;
+  margin: .45rem 0 .35rem;
+  padding: .65rem .8rem;
   background: var(--surface-1);
   border: 1px solid var(--border);
   border-left: 3px solid var(--series-1);
@@ -237,23 +242,35 @@ h1 {
   line-height: 1.15;
 }
 .big .unit { font-size: .95rem; font-weight: 600; margin-left: -.35rem; }
-.big .per { font-size: .8125rem; font-weight: 600; color: var(--text-secondary); }
-.ratio {
-  font-size: .8125rem;
-  font-weight: 700;
-  color: var(--surface-1);
-  background: var(--series-1);
-  border-radius: 999px;
-  padding: .15rem .55rem;
-  white-space: nowrap;
-}
 
-.vs {
-  margin: 0 0 .25rem;
-  font-size: .8125rem;
+/* いつの・誰の話か。数字の意味は数字より先に置く */
+.period {
+  margin: .1rem 0 0;
+  font-size: .75rem;
   color: var(--text-secondary);
 }
-.vs b { color: var(--text-primary); }
+
+/* 比べる相手。行の見出しが「何と」、右が「その額」、最後が「いまとの関係」 */
+.cmp {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: .75rem;
+  font-variant-numeric: tabular-nums;
+}
+.cmp th,
+.cmp td { padding: .1rem 0; vertical-align: baseline; }
+.cmp th {
+  text-align: left;
+  font-weight: 400;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  padding-right: .5rem;
+}
+.cmp td { text-align: right; }
+.cmp-yen { color: var(--text-primary); white-space: nowrap; }
+.cmp-note { margin-left: .45rem; white-space: nowrap; }
+.cmp-note.up { color: var(--ok); }
+.cmp-note.down { color: var(--text-muted); }
 
 .parts {
   margin: 0 0 .3rem;
@@ -267,7 +284,7 @@ h1 {
 }
 
 .three {
-  margin: 0;
+  margin: .35rem 0 0;
   font-size: .8125rem;
   color: var(--text-secondary);
 }
