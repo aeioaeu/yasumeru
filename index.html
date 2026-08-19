@@ -76,7 +76,7 @@
     <p class="sr-only" id="live-status" role="status" aria-live="polite" aria-atomic="true"></p>
     <h2 id="res-h">育休中の、ひと月あたりの手取り（二人合わせて）</h2>
     <p class="period" id="res-period"></p>
-    <p class="big"><span id="net-value">—</span><span class="unit">円</span></p>
+    <p class="big"><span id="net-value">—</span><span class="unit">万円</span></p>
     <p class="parts" id="net-parts"></p>
 
     <table class="cmp">
@@ -201,7 +201,8 @@
       <details>
         <summary>決めごとを全部見る</summary>
         <ul class="assume">
-          <li>お給料は<strong>万円単位</strong>で受け取っています。社会保険料は等級表、住民税は自治体で変わるので、<strong>一円単位の精度は出せません</strong>。</li>
+          <li>お給料は<strong>万円単位</strong>で受け取り、出す額も<strong>0.1万円（1,000円）単位</strong>で丸めています。社会保険料は等級表、住民税は自治体で変わるので、<strong>一円単位の精度は出せません</strong>。</li>
+          <li>内訳の足し算が合うように、丸めの端数は<strong>いずれか1つの項に寄せています</strong>（寄せる先は、寄せても元の額から一番離れないものを選びます。ずれは最大1,000円）。</li>
           <li>出産予定日どおりに生まれるものとして計算しています。</li>
           <li>母は産前6週・産後8週の産休のあと、育休を子が1歳になるまで取る前提です（<strong>産後8週間は就業させてはならない</strong>ので——労基法65条——ここは動かせません）。保育園に入れないときの1歳6か月・2歳への延長は入れていません。</li>
           <li>父の育休は生まれた日から始まる前提です。あとから取る場合、出生後休業支援給付金（13%）の対象期間を外れることがあります。</li>

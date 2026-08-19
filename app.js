@@ -2,12 +2,16 @@ import { RULES, SOURCES } from './rules-2026.js';
 import { simulateHousehold } from './calc.js';
 
 const $ = (id) => document.getElementById(id);
-const fmt = (n) => Math.round(n).toLocaleString('ja-JP');
-const man = (n) => {
-  const v = n / 10000;
-  const s = Math.abs(v) >= 100 ? v.toFixed(0) : v.toFixed(1).replace(/\.0$/, '');
-  return `${s}万円`;
-};
+
+// 画面に出す額は全部「万円」。入力が万円単位なので、答えを1円まで出すと
+// 持っていない精度を主張することになる（社会保険料は等級表、住民税は自治体で変わる）。
+//
+// man10() で 0.1万円（＝1,000円）に丸めた「数」を作り、manNum() が文字にする。
+// 100万円を超えたら整数に丸める、という手加減はしない。丸め方を額で変えると、
+// 内訳の足し算が合わなくなる（120 + 30 − 46 は 105 にならない）。
+const man10 = (n) => Math.round(n / 1000) / 10;
+const manNum = (v) => v.toFixed(1).replace(/\.0$/, '');
+const man = (n) => `${manNum(man10(n))}万円`;
 
 // ── 入力を読む ────────────────────────────
 
@@ -46,6 +50,27 @@ function readConfig() {
   };
 }
 
+// 0.1万円に丸めると、内訳の足し引きが合計と合わなくなることがある
+// （780通りで試して36%）。ずれは必ず0.1万円なので、それを1つの項に寄せる。
+// 寄せ先は「寄せても真の値から一番離れない項」を選ぶ。
+// 画面の足し算が合わないと、そこで読むのが止まる。
+function balance(values, signs, target) {
+  const shown = values.map(man10);
+  const sum = () => Math.round(shown.reduce((a, v, i) => a + v * signs[i], 0) * 10) / 10;
+  const residual = Math.round((target - sum()) * 10) / 10;
+  if (residual === 0) return shown;
+
+  // 各項について、その項で吸収したときに増える誤差を測り、一番小さいものを選ぶ
+  let best = 0, bestErr = Infinity;
+  values.forEach((v, i) => {
+    const delta = residual / signs[i];
+    const err = Math.abs(shown[i] + delta - v / 10000);
+    if (err < bestErr) { bestErr = err; best = i; }
+  });
+  shown[best] = Math.round((shown[best] + residual / signs[best]) * 10) / 10;
+  return shown;
+}
+
 // ── 結果 ────────────────────────────────
 //
 // 出すのは1つだけ。「二人とも家にいる間、世帯の手取りはいくらか」。
@@ -73,7 +98,8 @@ function drawResult(house, months) {
   const withoutFather = avg((m) => m.skipNetExBonus);
   const ratio = sn.normalNet > 0 ? Math.round((during / sn.normalNet) * 100) : null;
 
-  $('net-value').textContent = fmt(during);
+  const shown = man10(during);
+  $('net-value').textContent = manNum(shown);
 
   // いつの、誰の話なのか。数字より先に置く
   $('res-period').textContent = `あなたの育休 ${months}か月のあいだ（パートナーも休業中）`;
@@ -86,25 +112,30 @@ function drawResult(house, months) {
   const cut = avg((m) =>
     m.take.mother.shahoOnSalary + m.take.father.shahoOnSalary +
     m.take.mother.incomeTax + m.take.father.incomeTax + m.residentTax);
+  const [g, s, c] = balance([got, salary, cut], [1, 1, -1], shown);
   $('net-parts').innerHTML =
-    `内訳：給付金と手当金 ${fmt(got)}円` +
+    `内訳：給付金と手当金 ${manNum(g)}万円` +
     (house.shusseigo.take.father > 0 ? '（最初の28日は+13%）' : '') +
-    ` ＋ お給料 ${fmt(salary)}円 − 税・社会保険料 ${fmt(cut)}円`;
+    ` ＋ お給料 ${manNum(s)}万円 − 税・社会保険料 ${manNum(c)}万円`;
 
   // 比べる相手を2つ並べる。どちらも「いまの額」を主語にして書く。
   // 差だけ・割合だけを出すと、何を基準にした数字なのかが読み取れない。
-  const gap = during - withoutFather;
+  //
+  // 差は「出ている数字どうしの引き算」で出す。丸める前の額から出すと、
+  // 画面の 61.6 − 61.2 と注記の 0.5万円 が食い違うことがある。
+  const skipShown = man10(withoutFather);
+  const gap = Math.round((shown - skipShown) * 10) / 10;
   const rows = [
-    ['ふだんの月', sn.normalNet, ratio != null ? `いまはその ${ratio}%` : '', 'down'],
-    ['取らない場合', withoutFather,
-      gap >= 0 ? `いまのほうが ${fmt(gap)}円 多い` : `いまのほうが ${fmt(-gap)}円 少ない`,
-      gap >= 0 ? 'up' : 'down'],
+    ['ふだんの月', man10(sn.normalNet), ratio != null ? `いまはその ${ratio}%` : '', 'down'],
+    ['取らない場合', skipShown,
+      gap >= 0 ? `いまのほうが ${manNum(gap)}万円 多い` : `いまのほうが ${manNum(-gap)}万円 少ない`,
+      gap > 0 ? 'up' : 'down'],
   ];
   // 額と注記は別の列にする。同じセルに入れると、注記の長さで額の右端が動いて
   // 行どうしの桁が揃わなくなる（縦に並べた数字は、揃っていないと比べられない）。
   $('cmp-body').innerHTML = rows.map(([label, value, note, tone]) =>
     `<tr><th scope="row">${label}</th>` +
-    `<td class="cmp-yen">${fmt(value)}円</td>` +
+    `<td class="cmp-yen">${manNum(value)}万円</td>` +
     `<td class="cmp-note ${tone}">${note}</td></tr>`
   ).join('');
 
@@ -116,8 +147,8 @@ function drawResult(house, months) {
   // 読み上げには、変わった結果を一文で渡す（数字だけ読み上げても意味にならない）
   $('live-status').textContent =
     `${LABELS.father}の育休は${months}か月。` +
-    `そのあいだの世帯の手取りは、ひと月あたり およそ ${fmt(during)}円。` +
-    `育休を取らない場合は ${fmt(withoutFather)}円です。`;
+    `そのあいだの世帯の手取りは、ひと月あたり およそ ${manNum(shown)}万円。` +
+    `育休を取らない場合は ${manNum(skipShown)}万円です。`;
 }
 
 // スライダーの線を、いまの値まで色で埋める
