@@ -271,17 +271,25 @@ h1 {
   font-variant-numeric: tabular-nums;
 }
 .cmp th,
-.cmp td { padding: .1rem 0; vertical-align: baseline; }
+.cmp td {
+  padding: .1rem 0;
+  vertical-align: baseline;
+  white-space: nowrap;
+}
 .cmp th {
   text-align: left;
   font-weight: 400;
   color: var(--text-secondary);
-  white-space: nowrap;
-  padding-right: .5rem;
+  width: 100%;          /* 余りを見出しに持たせて、右の2列を内容の幅に詰める */
 }
-.cmp td { text-align: right; }
-.cmp-yen { color: var(--text-primary); white-space: nowrap; }
-.cmp-note { margin-left: .45rem; white-space: nowrap; }
+/* 額の列。右端を揃えるために、注記とは別の列にしてある。
+   列間の余白は .cmp td より詳細度を上げないと効かない（上で padding を0にしているため）。 */
+.cmp td.cmp-yen {
+  text-align: right;
+  color: var(--text-primary);
+  padding-left: .6rem;
+}
+.cmp td.cmp-note { text-align: right; padding-left: .6rem; }
 .cmp-note.up { color: var(--ok); }
 .cmp-note.down { color: var(--text-muted); }
 

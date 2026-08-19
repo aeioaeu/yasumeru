@@ -98,10 +98,12 @@ function drawResult(house, months) {
       gap >= 0 ? `いまのほうが ${fmt(gap)}円 多い` : `いまのほうが ${fmt(-gap)}円 少ない`,
       gap >= 0 ? 'up' : 'down'],
   ];
+  // 額と注記は別の列にする。同じセルに入れると、注記の長さで額の右端が動いて
+  // 行どうしの桁が揃わなくなる（縦に並べた数字は、揃っていないと比べられない）。
   $('cmp-body').innerHTML = rows.map(([label, value, note, tone]) =>
     `<tr><th scope="row">${label}</th>` +
-    `<td><b class="cmp-yen">${fmt(value)}円</b>` +
-    `<span class="cmp-note ${tone}">${note}</span></td></tr>`
+    `<td class="cmp-yen">${fmt(value)}円</td>` +
+    `<td class="cmp-note ${tone}">${note}</td></tr>`
   ).join('');
 
   // 差額は入口にしない。答えを見たあとに、1行だけ置く
